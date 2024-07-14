@@ -13,8 +13,11 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+<<<<<<< HEAD
 cover.html
 cover.out.tmp
+=======
+>>>>>>> 0fd70a0 (Initial commit)
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
