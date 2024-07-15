@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 
@@ -11,13 +12,16 @@ func main() {
 	log.SetFlags(0) // Removes timestamp
 
 	// TODO: Make it configurable
-	phabToken := os.Getenv("PHAB_TOKEN")
-	if err := run(phabToken, os.Args[1:]); err != nil {
+	r := runner{
+		flagSet: flag.NewFlagSet("diffy", flag.ContinueOnError),
+	}
+	if err := r.run(os.Args[1:]); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(phabToken string, users []string) error {
+func getUsersFromPhab(users []string) error {
+	phabToken := os.Getenv("PHAB_TOKEN")
 	// TODO: Make it installable to make it easier for testing
 	c, err := client.New(phabToken)
 	if err != nil {
