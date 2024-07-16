@@ -17,6 +17,8 @@ func TestNewFlagSet(t *testing.T) {
 	}{
 		{desc: "no flags", give: []string{}, want: &config.Config{}},
 		{desc: "settings", give: []string{"--settings"}, want: &config.Config{Settings: true}},
+		{desc: "phab_users", give: []string{"--phab_users=user,user1"}, want: &config.Config{PhabUsers: []string{"user", "user1"}}},
+		{desc: "github_users", give: []string{"--github_users=user,user1"}, want: &config.Config{GithubUsers: []string{"user", "user1"}}},
 	}
 
 	for _, tt := range tests {
