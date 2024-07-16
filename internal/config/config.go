@@ -1,5 +1,7 @@
 package config
 
 type Config struct {
-	Settings bool
+	Settings    bool
+	PhabUsers   []string
+	GithubUsers []string
 }

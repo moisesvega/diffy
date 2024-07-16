@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/moisesvega/diffy/internal/config"
+	"github.com/spf13/pflag"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -15,13 +16,14 @@ func TestNewFlagSet(t *testing.T) {
 		want *config.Config
 	}{
 		{desc: "no flags", give: []string{}, want: &config.Config{}},
-		{desc: "settings", give: []string{"--settings"}, want: &config.Config{}},
+		{desc: "settings", give: []string{"--settings"}, want: &config.Config{Settings: true}},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			cfg := &config.Config{}
-			fs := newFlagSet("test", cfg, nil)
+			pfs := &pflag.FlagSet{}
+			fs := registerFlags(pfs, cfg)
 			err := fs.Parse(tt.give)
 			require.NoError(t, err)
 			require.NotNil(t, cfg)
