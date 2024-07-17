@@ -13,7 +13,7 @@ func registerFlags(fs *pflag.FlagSet, cfg *config.Config) *pflag.FlagSet {
 	// Phabricator Configuration
 	fs.StringVar(&cfg.PhabricatorConfig.APIToken, "api_token", "", "api_token=token")
 	fs.StringVar(&cfg.PhabricatorConfig.AccessToken, "access_token", "", "access_token=token")
-	fs.StringVar(&cfg.PhabricatorConfig.ArcrcFilePath, "arrc_file", "~/.arcrc", "arrc_file=~/.arcrc")
+	fs.StringVar(&cfg.PhabricatorConfig.ArcrcFilePath, "arrc_file", "", "arrc_file=~/.arcrc")
 
 	// Github Configuration
 	return fs
