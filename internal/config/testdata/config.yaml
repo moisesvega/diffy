@@ -1,8 +1,0 @@
-phab_users:
-  - user
-  - user1
-github_users:
-  - user
-  - user1
-phabricator_config:
-  url: "someURL"

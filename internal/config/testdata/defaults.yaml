@@ -1,0 +1,10 @@
+settings: false
+phab_users: []
+github_users: []
+phabricator_config:
+    url: ""
+    api_token: ""
+    api_token_env: PHAB_API_TOKEN
+    access_token: ""
+    access_token_env: PHAB_ACCESS_TOKEN
+    arrc_file_path: ~/.arcrc
