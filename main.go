@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/moisesvega/diffy/internal/client/phabricator"
 	"github.com/moisesvega/diffy/internal/config"
 	"github.com/spf13/cobra"
 )
@@ -10,7 +11,7 @@ import (
 func main() {
 	log.SetFlags(0) // Removes timestamp
 	// TODO: Make it configurable
-	r := runner{cfg: &config.Config{}}
+	r := runner{cfg: &config.Config{}, phabClient: phabricator.NewClient()}
 	cmd := cobra.Command{
 		Use:           "diffy",
 		Short:         "CLI designed to deliver comprehensive statistics and insights from code reviews and differential analysis",

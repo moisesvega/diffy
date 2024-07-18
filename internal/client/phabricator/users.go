@@ -1,4 +1,4 @@
-package client
+package phabricator
 
 import (
 	"github.com/uber/gonduit/constants"
