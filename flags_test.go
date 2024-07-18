@@ -19,6 +19,11 @@ func TestNewFlagSet(t *testing.T) {
 		{desc: "settings", give: []string{"--settings"}, want: &config.Config{Settings: true}},
 		{desc: "phab_users", give: []string{"--phab_users=user,user1"}, want: &config.Config{PhabUsers: []string{"user", "user1"}}},
 		{desc: "github_users", give: []string{"--github_users=user,user1"}, want: &config.Config{GithubUsers: []string{"user", "user1"}}},
+		// Phab Config
+		{desc: "phab_url", give: []string{"--phab_url=someString"}, want: &config.Config{PhabricatorConfig: config.PhabricatorConfig{URL: "someString"}}},
+		{desc: "phab_api_token", give: []string{"--phab_api_token=someString"}, want: &config.Config{PhabricatorConfig: config.PhabricatorConfig{APIToken: "someString"}}},
+		{desc: "phab_access_token", give: []string{"--phab_access_token=someString"}, want: &config.Config{PhabricatorConfig: config.PhabricatorConfig{AccessToken: "someString"}}},
+		{desc: "arrc_file", give: []string{"--arrc_file=someString"}, want: &config.Config{PhabricatorConfig: config.PhabricatorConfig{ArcrcFilePath: "someString"}}},
 	}
 
 	for _, tt := range tests {

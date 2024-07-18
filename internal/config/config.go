@@ -8,7 +8,8 @@ type Config struct {
 }
 
 type PhabricatorConfig struct {
-	ArcrcFilePath string `yaml:"arrc_file_path"`
+	URL           string `yaml:"url"`
 	APIToken      string `yaml:"api_token"`
 	AccessToken   string `yaml:"access_token"`
+	ArcrcFilePath string `yaml:"arrc_file_path"`
 }
