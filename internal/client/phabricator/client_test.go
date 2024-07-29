@@ -1,11 +1,14 @@
 package phabricator
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/moisesvega/diffy/internal/config"
 	"github.com/stretchr/testify/require"
+	"github.com/uber/gonduit/requests"
+	"github.com/uber/gonduit/responses"
 	"github.com/uber/gonduit/test/server"
 )
 
@@ -63,8 +66,29 @@ func TestClientRequiredConfig(t *testing.T) {
 	}
 }
 
-//go:generate mockgen -source=client.go -destination=mock_phabricator/mocks.go -self_package=github.com/moisesvega/diffy/internal/client/phabricator/mock_phabricator
+type fakeConn struct {
+	userQueryfn          func(req requests.UserQueryRequest) (*responses.UserQueryResponse, error)
+	dfifferentialQueryfn func(req requests.DifferentialQueryRequest) (*responses.DifferentialQueryResponse, error)
+}
+
+func (f fakeConn) UserQuery(req requests.UserQueryRequest) (*responses.UserQueryResponse, error) {
+	return f.userQueryfn(req)
+}
+
+func (f fakeConn) DifferentialQuery(req requests.DifferentialQueryRequest) (*responses.DifferentialQueryResponse, error) {
+	return f.dfifferentialQueryfn(req)
+}
 
 func TestClient_GetUsers(t *testing.T) {
 	// TODO: Create tests for Get Users:
+	conn := fakeConn{
+		userQueryfn: func(req requests.UserQueryRequest) (*responses.UserQueryResponse, error) {
+			return nil, errors.New("err")
+		},
+	}
+	c := client{conn: conn}
+
+	u, err := c.GetUsers([]string{"hello"})
+	require.Error(t, err)
+	require.Nil(t, u)
 }

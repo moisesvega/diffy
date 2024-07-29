@@ -13,6 +13,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
+//go:generate mockgen -source=client.go -destination=mock_phabricator/mocks.go -self_package=github.com/moisesvega/diffy/internal/client/phabricator/mock_phabricator
+
 type Client interface {
 	New(cfg *config.PhabricatorConfig) (Client, error)
 	GetUsers(strings []string) ([]*User, error)
