@@ -37,12 +37,12 @@ func TestClientRequiredConfig(t *testing.T) {
 		{desc: "url_not_provided", give: &config.PhabricatorConfig{APIToken: "1"}, want: errNoURLProvided},
 		{
 			desc: "arcrc_not_found",
-			give: &config.PhabricatorConfig{APIToken: "1", URL: "1", ArcrcFilePath: "imposible"},
+			give: &config.PhabricatorConfig{APIToken: "1", URL: "1", ArcrcFilePath: "impossible"},
 			want: fmt.Errorf("unable to find .arrcrc file"),
 		},
 		{
 			desc: "url_not_provided",
-			give: &config.PhabricatorConfig{APIToken: "1", URL: "1", ArcrcFilePath: "imposible"},
+			give: &config.PhabricatorConfig{APIToken: "1", URL: "1", ArcrcFilePath: "impossible"},
 			want: fmt.Errorf("unable to find .arrcrc file"),
 		},
 	}
