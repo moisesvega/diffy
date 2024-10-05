@@ -3,26 +3,11 @@ package main
 import (
 	"log"
 
-	"github.com/moisesvega/diffy/internal/client/phabricator"
-	"github.com/moisesvega/diffy/internal/config"
-	"github.com/spf13/cobra"
+	"github.com/moisesvega/diffy/internal/cmd"
 )
 
 func main() {
-	log.SetFlags(0) // Removes timestamp
-	// TODO: Make it configurable
-	r := runner{cfg: &config.Config{}, phabClient: phabricator.NewClient()}
-	cmd := cobra.Command{
-		Use:           "diffy",
-		Short:         "CLI designed to deliver comprehensive statistics and insights from code reviews and differential analysis",
-		SilenceUsage:  true,
-		SilenceErrors: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return r.run(cmd.Flags().Args())
-		},
-	}
-	registerFlags(cmd.Flags(), r.cfg)
-	if err := cmd.Execute(); err != nil {
+	if err := cmd.Main().Execute(); err != nil {
 		log.Fatal(err)
 	}
 }

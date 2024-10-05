@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"log"
@@ -10,7 +10,7 @@ import (
 
 type runner struct {
 	cfg        *config.Config
-	phabClient phabricator.Client
+	phabClient phabricator.PhabClient
 }
 
 func (r *runner) run(args []string) error {

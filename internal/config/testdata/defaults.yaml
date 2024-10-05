@@ -8,4 +8,3 @@ phabricator_config:
     access_token: ""
     access_token_env: PHAB_ACCESS_TOKEN
     arrc_file_path: ~/.arcrc
-          

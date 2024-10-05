@@ -13,37 +13,36 @@ import (
 	reflect "reflect"
 
 	phabricator "github.com/moisesvega/diffy/internal/client/phabricator"
-	config "github.com/moisesvega/diffy/internal/config"
 	requests "github.com/uber/gonduit/requests"
 	responses "github.com/uber/gonduit/responses"
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockClient is a mock of Client interface.
-type MockClient struct {
+// MockPhabClient is a mock of PhabClient interface.
+type MockPhabClient struct {
 	ctrl     *gomock.Controller
-	recorder *MockClientMockRecorder
+	recorder *MockPhabClientMockRecorder
 }
 
-// MockClientMockRecorder is the mock recorder for MockClient.
-type MockClientMockRecorder struct {
-	mock *MockClient
+// MockPhabClientMockRecorder is the mock recorder for MockPhabClient.
+type MockPhabClientMockRecorder struct {
+	mock *MockPhabClient
 }
 
-// NewMockClient creates a new mock instance.
-func NewMockClient(ctrl *gomock.Controller) *MockClient {
-	mock := &MockClient{ctrl: ctrl}
-	mock.recorder = &MockClientMockRecorder{mock}
+// NewMockPhabClient creates a new mock instance.
+func NewMockPhabClient(ctrl *gomock.Controller) *MockPhabClient {
+	mock := &MockPhabClient{ctrl: ctrl}
+	mock.recorder = &MockPhabClientMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockClient) EXPECT() *MockClientMockRecorder {
+func (m *MockPhabClient) EXPECT() *MockPhabClientMockRecorder {
 	return m.recorder
 }
 
 // GetUsers mocks base method.
-func (m *MockClient) GetUsers(strings []string) ([]*phabricator.User, error) {
+func (m *MockPhabClient) GetUsers(strings []string) ([]*phabricator.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUsers", strings)
 	ret0, _ := ret[0].([]*phabricator.User)
@@ -52,24 +51,9 @@ func (m *MockClient) GetUsers(strings []string) ([]*phabricator.User, error) {
 }
 
 // GetUsers indicates an expected call of GetUsers.
-func (mr *MockClientMockRecorder) GetUsers(strings any) *gomock.Call {
+func (mr *MockPhabClientMockRecorder) GetUsers(strings any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockClient)(nil).GetUsers), strings)
-}
-
-// New mocks base method.
-func (m *MockClient) New(cfg *config.PhabricatorConfig) (phabricator.Client, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "New", cfg)
-	ret0, _ := ret[0].(phabricator.Client)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// New indicates an expected call of New.
-func (mr *MockClientMockRecorder) New(cfg any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockClient)(nil).New), cfg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockPhabClient)(nil).GetUsers), strings)
 }
 
 // Mockigonduit is a mock of igonduit interface.

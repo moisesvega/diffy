@@ -15,12 +15,11 @@ import (
 
 //go:generate mockgen -source=client.go -destination=mock_phabricator/mocks.go -self_package=github.com/moisesvega/diffy/internal/client/phabricator/mock_phabricator
 
-type Client interface {
-	New(cfg *config.PhabricatorConfig) (Client, error)
+type PhabClient interface {
 	GetUsers(strings []string) ([]*User, error)
 }
 
-type client struct {
+type Client struct {
 	conn igonduit
 }
 
@@ -29,21 +28,17 @@ type igonduit interface {
 	DifferentialQuery(req requests.DifferentialQueryRequest) (*responses.DifferentialQueryResponse, error)
 }
 
-func NewClient() Client {
-	return &client{}
-}
-
 var (
 	errNoAPITokenProvided = errors.New("no API token provided")
 	errNoURLProvided      = errors.New("no URL provided")
 )
 
-func (c *client) New(cfg *config.PhabricatorConfig) (Client, error) {
+func New(cfg *config.PhabricatorConfig) (PhabClient, error) {
 	if cfg == nil {
 		return nil, errors.New("phabricator config is required")
 	}
 	conn, err := createConnection(cfg)
-	return &client{conn: conn}, err
+	return &Client{conn: conn}, err
 }
 
 func createConnection(cfg *config.PhabricatorConfig) (*gonduit.Conn, error) {
@@ -79,7 +74,7 @@ func createConnection(cfg *config.PhabricatorConfig) (*gonduit.Conn, error) {
 	})
 }
 
-func (c *client) GetUsers(names []string) ([]*User, error) {
+func (c *Client) GetUsers(names []string) ([]*User, error) {
 	res, err := c.conn.UserQuery(requests.UserQueryRequest{
 		Usernames: names,
 	})
