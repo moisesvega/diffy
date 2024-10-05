@@ -1,13 +1,18 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/moisesvega/diffy/internal/config"
 	"github.com/spf13/cobra"
 )
 
 func Main() *cobra.Command {
 	r := &runner{
-		cfg: &config.Config{},
+		stdin:  os.Stdin,
+		stdout: os.Stdout,
+		stderr: os.Stderr,
+		cfg:    &config.Config{},
 	}
 	cmd := &cobra.Command{
 		Use:           "diffy",
@@ -19,6 +24,7 @@ func Main() *cobra.Command {
 			return r.run(cmd.Flags().Args())
 		},
 	}
+
 	setFlags(cmd.Flags(), r.cfg)
 	return cmd
 }
