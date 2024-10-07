@@ -1,39 +1,21 @@
-settings: false
-phab_users: []
-github_users: []
-phabricator_config:
-    url: ""
-    api_token: ""
-    api_token_env: PHAB_API_TOKEN
-    access_token: ""
-    access_token_env: PHAB_ACCESS_TOKEN
-    arrc_file_path: ~/.arcrc
-
-
-# TODO(moises): create a better yaml file.
-
+me:
+    phabricator: <replace_me>
+    github: <replace_me>
 apis:
     phabricator:
-        base_url: "some"
-        api_token_env: PHAB_API_TOKEN
+        base_url: <replace_me>
         api_token: ""
+        api_token_env: PHAB_API_TOKEN
+        access_token: ""
         access_token_env: PHAB_ACCESS_TOKEN
-        arrc_file_path : ~.arcrc
-
+        arrc_file_path: ~/.arcrc
     github:
-        base_url:
-        api_token_env:
-        api_token:
-
-me:
-    phab: user
-    github: user
-
+        base_url: https://github.com/
+        api_token: ""
+        api_token_env: GITHUB_API_TOKEN
 teams:
     a_team:
-        phab_users:
-            - user_one
-            - user_two
+        phabricator_users:
+            - <replace_me>
         github_users:
-            - user_one
-            - user_two
+            - <replace_me>

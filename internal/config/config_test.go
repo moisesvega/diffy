@@ -11,14 +11,27 @@ import (
 
 func TestReadConfiguration(t *testing.T) {
 	file := `
-phab_users:
-  - user
-  - user1
-github_users:
-  - user
-  - user1
-phabricator_config:
-  url: "someURL"
+me:
+    phabricator: <replace_me>
+    github: <replace_me>
+apis:
+    phabricator:
+        base_url: <replace_me>
+        api_token: ""
+        api_token_env: PHAB_API_TOKEN
+        access_token: ""
+        access_token_env: PHAB_ACCESS_TOKEN
+        arrc_file_path: ~/.arcrc
+    github:
+        base_url: https://github.com/
+        api_token: ""
+        api_token_env: GITHUB_API_TOKEN
+teams:
+    a_team:
+        phabricator_users:
+            - <replace_me>
+        github_users:
+            - <replace_me>
 `
 	fp := path.Join(t.TempDir(), "test.yaml")
 	require.NoError(t, os.WriteFile(fp, []byte(file), 0644))
@@ -30,7 +43,7 @@ phabricator_config:
 func TestReadConfigurationParseError(t *testing.T) {
 	file := `
 phab_users:
-  - phabricator_config:
+  - phabricator_config: {json: - fail}
 `
 	fp := path.Join(t.TempDir(), "test.yaml")
 	require.NoError(t, os.WriteFile(fp, []byte(file), 0644))
@@ -51,7 +64,7 @@ func TestWriteConfiguration(t *testing.T) {
 	got, err := yaml.Marshal(defaults)
 	require.NoError(t, err)
 	require.NotEmpty(t, got)
-	// os.WriteFile(path.Join("./testdata/defaults.yaml"), got, 0644)
+	os.WriteFile(path.Join("./testdata/defaults.yaml"), got, 0644)
 	want, err := os.ReadFile("./testdata/defaults.yaml")
 	require.NoError(t, err)
 	require.NotEmpty(t, want)
