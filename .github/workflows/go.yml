@@ -12,13 +12,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        - name: Setup Go ${{ matrix.go-version }}
-          uses: actions/setup-go@v5
-          with:
-            go-version: ${{ matrix.go-version }}
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+      # You can test your matrix by printing the current Go version
+      - name: Display Go version
+        run: go version
 
-        - name: Download Dependencies
-          run: go mod download
+      - name: Download Dependencies
+        run: go mod download
 
-        - name: Test
-          run: make cover
+      - name: Test
+        run: make cover
