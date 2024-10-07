@@ -25,3 +25,13 @@ cover:
 .PHONY: tidy
 tidy:
 	@$(foreach dir,$(MODULES),(cd $(dir) && go mod tidy) &&) true
+
+.PHONY: lint
+lint: golangci-lint
+
+.PHONY: golangci-lint
+golangci-lint:
+	@$(foreach mod,$(MODULES), \
+		(cd $(mod) && \
+		echo "[lint] golangci-lint: $(mod)" && \
+		golangci-lint run --path-prefix $(mod)) &&) true
