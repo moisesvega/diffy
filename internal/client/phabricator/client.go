@@ -13,13 +13,12 @@ import (
 	"golang.org/x/oauth2"
 )
 
-//go:generate mockgen -source=client.go -destination=mock_phabricator/mocks.go -self_package=github.com/moisesvega/diffy/internal/client/phabricator/mock_phabricator
-
-type PhabClient interface {
+type Client interface {
+	// GetUsers returns a list of users with their differentials and reviews.
 	GetUsers(strings []string) ([]*User, error)
 }
 
-type Client struct {
+type client struct {
 	conn igonduit
 }
 
@@ -33,12 +32,13 @@ var (
 	errNoURLProvided      = errors.New("no URL provided")
 )
 
-func New(cfg *config.Phabricator) (PhabClient, error) {
+// New creates a new Phabricator client
+func New(cfg *config.Phabricator) (Client, error) {
 	if cfg == nil {
 		return nil, errors.New("phabricator config is required")
 	}
 	conn, err := createConnection(cfg)
-	return &Client{conn: conn}, err
+	return &client{conn: conn}, err
 }
 
 func createConnection(cfg *config.Phabricator) (*gonduit.Conn, error) {
@@ -74,7 +74,8 @@ func createConnection(cfg *config.Phabricator) (*gonduit.Conn, error) {
 	})
 }
 
-func (c *Client) GetUsers(names []string) ([]*User, error) {
+// GetUsers returns a list of users with their differentials and reviews.
+func (c *client) GetUsers(names []string) ([]*User, error) {
 	res, err := c.conn.UserQuery(requests.UserQueryRequest{
 		Usernames: names,
 	})
@@ -110,7 +111,7 @@ func (c *Client) GetUsers(names []string) ([]*User, error) {
 // 	Email string `json:"email"`
 // }
 //
-// func (c *Client) CheckConnection() error {
+// func (c *client) CheckConnection() error {
 // 	whoami := whoamiresponse{}
 // 	if err := c.conn.Call("user.whoami", &requests.Request{}, &whoami); err != nil {
 // 		return fmt.Errorf("unable to call user.whoami: %w", err)

@@ -16,7 +16,7 @@ type runner struct {
 	stderr io.Writer
 
 	cfg        *config.Config
-	phabClient phabricator.PhabClient
+	phabClient phabricator.Client
 }
 
 const (
