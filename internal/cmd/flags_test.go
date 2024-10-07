@@ -33,11 +33,13 @@ func TestNewFlagSet(t *testing.T) {
 		Settings:    true,
 		PhabUsers:   users,
 		GithubUsers: users,
-		PhabricatorConfig: config.PhabricatorConfig{
-			URL:           url,
-			APIToken:      token,
-			AccessToken:   token,
-			ArcrcFilePath: somePath,
+		APIs: config.APIs{
+			Phabricator: config.Phabricator{
+				URL:           url,
+				APIToken:      token,
+				AccessToken:   token,
+				ArcrcFilePath: somePath,
+			},
 		},
 	}
 

@@ -13,10 +13,10 @@ func setFlags(fs *pflag.FlagSet, cfg *config.Config) {
 
 	// Phabricator Configuration
 	// TODO: Look into how to parse the URL in this step
-	fs.StringVar(&cfg.PhabricatorConfig.URL, "phab_url", "", "Phabricator API url")
-	fs.StringVar(&cfg.PhabricatorConfig.APIToken, "phab_api_token", "", "API token this could be inside of your .arrc")
-	fs.StringVar(&cfg.PhabricatorConfig.AccessToken, "phab_access_token", "", "If API URL is protected by oauth you can provide your access token here")
-	fs.StringVar(&cfg.PhabricatorConfig.ArcrcFilePath, "arrc_file", "", "If provided it will read the .arcrc and get URL and API Token")
+	fs.StringVar(&cfg.APIs.Phabricator.URL, "phab_url", "", "Phabricator API url")
+	fs.StringVar(&cfg.APIs.Phabricator.APIToken, "phab_api_token", "", "API token this could be inside of your .arrc")
+	fs.StringVar(&cfg.APIs.Phabricator.AccessToken, "phab_access_token", "", "If API URL is protected by oauth you can provide your access token here")
+	fs.StringVar(&cfg.APIs.Phabricator.ArcrcFilePath, "arrc_file", "", "If provided it will read the .arcrc and get URL and API Token")
 
 	// Github Configurati
 	// TODO: Create github configuration

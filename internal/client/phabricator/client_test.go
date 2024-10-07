@@ -15,7 +15,7 @@ func TestNew(t *testing.T) {
 		s := server.New()
 		t.Cleanup(s.Close)
 		s.RegisterCapabilities()
-		c, err := New(&config.PhabricatorConfig{APIToken: "1", URL: s.GetURL(), AccessToken: "1"})
+		c, err := New(&config.Phabricator{APIToken: "1", URL: s.GetURL(), AccessToken: "1"})
 		require.NoError(t, err)
 		require.NotNil(t, c)
 	})
@@ -30,19 +30,19 @@ func TestNew(t *testing.T) {
 func TestClientRequiredConfig(t *testing.T) {
 	tests := []struct {
 		desc string
-		give *config.PhabricatorConfig
+		give *config.Phabricator
 		want error
 	}{
-		{desc: "api_token_not_provided", give: &config.PhabricatorConfig{}, want: errNoAPITokenProvided},
-		{desc: "url_not_provided", give: &config.PhabricatorConfig{APIToken: "1"}, want: errNoURLProvided},
+		{desc: "api_token_not_provided", give: &config.Phabricator{}, want: errNoAPITokenProvided},
+		{desc: "url_not_provided", give: &config.Phabricator{APIToken: "1"}, want: errNoURLProvided},
 		{
 			desc: "arcrc_not_found",
-			give: &config.PhabricatorConfig{APIToken: "1", URL: "1", ArcrcFilePath: "impossible"},
+			give: &config.Phabricator{APIToken: "1", URL: "1", ArcrcFilePath: "impossible"},
 			want: fmt.Errorf("unable to find .arrcrc file"),
 		},
 		{
 			desc: "url_not_provided",
-			give: &config.PhabricatorConfig{APIToken: "1", URL: "1", ArcrcFilePath: "impossible"},
+			give: &config.Phabricator{APIToken: "1", URL: "1", ArcrcFilePath: "impossible"},
 			want: fmt.Errorf("unable to find .arrcrc file"),
 		},
 	}

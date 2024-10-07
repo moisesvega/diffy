@@ -33,7 +33,7 @@ var (
 	errNoURLProvided      = errors.New("no URL provided")
 )
 
-func New(cfg *config.PhabricatorConfig) (PhabClient, error) {
+func New(cfg *config.Phabricator) (PhabClient, error) {
 	if cfg == nil {
 		return nil, errors.New("phabricator config is required")
 	}
@@ -41,7 +41,7 @@ func New(cfg *config.PhabricatorConfig) (PhabClient, error) {
 	return &Client{conn: conn}, err
 }
 
-func createConnection(cfg *config.PhabricatorConfig) (*gonduit.Conn, error) {
+func createConnection(cfg *config.Phabricator) (*gonduit.Conn, error) {
 	if len(cfg.APIToken) == 0 && len(cfg.APITokenEnv) == 0 && len(cfg.ArcrcFilePath) == 0 {
 		return nil, errNoAPITokenProvided
 	}
