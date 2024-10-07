@@ -31,7 +31,7 @@ lint: golangci-lint
 
 .PHONY: golangci-lint
 golangci-lint:
-	@$(foreach mod,$(MODULES), \
+	@$(foreach mod,$(MODULE_DIRS), \
 		(cd $(mod) && \
 		echo "[lint] golangci-lint: $(mod)" && \
 		golangci-lint run --path-prefix $(mod)) &&) true
