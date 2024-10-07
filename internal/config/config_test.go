@@ -64,7 +64,9 @@ func TestWriteConfiguration(t *testing.T) {
 	got, err := yaml.Marshal(defaults)
 	require.NoError(t, err)
 	require.NotEmpty(t, got)
-	os.WriteFile(path.Join("./testdata/defaults.yaml"), got, 0644)
+	// TODO(moisesvega): Uncomment this line to update the defaults.yaml file
+	// Create a small script to run this test and update the defaults.yaml file
+	// os.WriteFile(path.Join("./testdata/defaults.yaml"), got, 0644)
 	want, err := os.ReadFile("./testdata/defaults.yaml")
 	require.NoError(t, err)
 	require.NotEmpty(t, want)

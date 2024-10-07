@@ -15,8 +15,8 @@ type runner struct {
 	stdout io.Writer
 	stderr io.Writer
 
-	cfg        *config.Config
-	phabClient phabricator.Client
+	cfg         *config.Config
+	phabricator phabricator.Client
 }
 
 const (
@@ -24,26 +24,25 @@ const (
 	_settingsFileName = "settings.yaml"
 )
 
-func (r *runner) run(args []string) error {
-	if r.cfg.Settings {
-		// TODO(moises): make it configurable.
-		// Finding application config files.
-		// SearchConfigFile takes one parameter which must contain the name of
-		// the file, but it can also contain a set of parent directories relative
-		// to the config search paths (xdg.ConfigHome and xdg.ConfigDirs).
-		configFilePath, err := xdg.SearchConfigFile("appname/config.yaml")
-		if err != nil {
-			// TODO(moises) create a default settings.yaml
-			log.Fatal(err)
-		}
+var (
+	_settingsFilePath = filepath.Join(_name, _settingsFileName)
+)
 
-		configFilePath, err = xdg.ConfigFile(filepath.Join(_name, _settingsFileName))
+func (r *runner) run(args []string) (err error) {
+	if r.cfg.Settings {
+		configFilePath, err := xdg.ConfigFile(_settingsFilePath)
 		if err != nil {
 			log.Fatal(err)
 		}
 		log.Println("Save the config file at:", configFilePath)
 
 		return openSettings(r.stdin, r.stdout, r.stderr, configFilePath)
+	}
+	if r.phabricator == nil {
+		r.phabricator, err = phabricator.New(&r.cfg.APIs.Phabricator)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

@@ -21,5 +21,4 @@ func setFlags(fs *pflag.FlagSet, cfg *config.Config) {
 	// Github Configurati
 	// TODO: Create github configuration
 	fs.SortFlags = false
-	return
 }
