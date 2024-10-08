@@ -38,11 +38,5 @@ func (r *runner) run(args []string) (err error) {
 
 		return openSettings(r.stdin, r.stdout, r.stderr, configFilePath)
 	}
-	if r.phabricator == nil {
-		r.phabricator, err = phabricator.New(&r.cfg.APIs.Phabricator)
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
