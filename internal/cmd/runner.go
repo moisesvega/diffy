@@ -7,6 +7,7 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/moisesvega/diffy/internal/config"
+	"github.com/moisesvega/diffy/internal/editor"
 	"github.com/moisesvega/diffy/internal/phabricator"
 )
 
@@ -17,6 +18,7 @@ type runner struct {
 
 	cfg         *config.Config
 	phabricator phabricator.Client
+	editor      editor.Open
 }
 
 const (
@@ -25,18 +27,17 @@ const (
 )
 
 var (
-	_settingsFilePath = filepath.Join(_name, _settingsFileName)
+	settingsFilePath = filepath.Join(_name, _settingsFileName)
 )
 
 func (r *runner) run(args []string) (err error) {
 	if r.cfg.Settings {
-		configFilePath, err := xdg.ConfigFile(_settingsFilePath)
+		configFilePath, err := xdg.ConfigFile(settingsFilePath)
 		if err != nil {
 			log.Fatal(err)
 		}
 		log.Println("Save the config file at:", configFilePath)
-
-		return openSettings(r.stdin, r.stdout, r.stderr, configFilePath)
+		return r.editor.OpenFile(configFilePath)
 	}
 	return nil
 }

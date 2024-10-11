@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/moisesvega/diffy/internal/config"
+	"github.com/moisesvega/diffy/internal/editor"
 	"github.com/spf13/cobra"
 )
 
@@ -13,6 +14,7 @@ func Main() *cobra.Command {
 		stdout: os.Stdout,
 		stderr: os.Stderr,
 		cfg:    &config.Config{},
+		editor: editor.New(os.Stdin, os.Stdout, os.Stderr),
 	}
 	cmd := &cobra.Command{
 		Use:           "diffy",
