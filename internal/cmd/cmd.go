@@ -27,6 +27,7 @@ func Main() *cobra.Command {
 		},
 	}
 
+	// TODO(moises): Just use the configuration file and relax the flags.
 	setFlags(cmd.Flags(), r.cfg)
 	return cmd
 }

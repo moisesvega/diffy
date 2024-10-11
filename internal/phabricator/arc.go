@@ -12,9 +12,11 @@ type arcRc struct {
 	} `json:"hosts"`
 }
 
+var errUnableToFindArcrcFile = fmt.Errorf("unable to find .arrcrc file")
+
 func getArcToken(filepath string) (string, error) {
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
-		return "", fmt.Errorf("unable to find .arrcrc file")
+		return "", errUnableToFindArcrcFile
 	}
 	f, err := os.Open(filepath)
 	if err != nil {
