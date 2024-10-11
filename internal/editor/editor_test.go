@@ -32,7 +32,7 @@ func TestOpenFile(t *testing.T) {
 			require.Len(t, args, 1)
 			assert.Equal(t, filepath, args[0])
 			// Return a fake command that will exit successfully
-			return fakeExecCommand("echo", "success")
+			return fakeExecCommand(command, args...)
 		},
 		In:  &in,
 		Out: out,
@@ -41,17 +41,32 @@ func TestOpenFile(t *testing.T) {
 	require.NoError(t, e.OpenFile(filepath))
 }
 
+const _fakeEnvVar = "GO_WANT_HELPER_PROCESS"
+
 func fakeExecCommand(command string, args ...string) *exec.Cmd {
+	// Create a fake command that will exit successfully
+	// This wil run the TestHelperProcess function
+	// and exit successfully
 	cs := []string{"-test.run=TestHelperProcess", "--", command}
 	cs = append(cs, args...)
 	cmd := exec.Command(os.Args[0], cs...)
-	cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
+	// set an environment variable to indicate that this is a fake command
+	// and not a real one
+	cmd.Env = []string{_fakeEnvVar + "=1"}
 	return cmd
 }
 
+// TestHelperProcess isn't a real test function, it's used as a helper
+// to run a fake command that will exit successfully
 func TestHelperProcess(t *testing.T) {
-	if os.Getenv("GO_WANT_HELPER_PROCESS") != "1" {
+	// This function is called by the fake command
+	switch os.Getenv(_fakeEnvVar) {
+	case "1":
+		// This is the child process
+		// called by the fake command
+		os.Exit(0)
+	default:
+		// This is the parent process
 		return
 	}
-	os.Exit(0)
 }
