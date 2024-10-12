@@ -27,7 +27,9 @@ func Main() *cobra.Command {
 		},
 	}
 
-	// TODO(moises): Just use the configuration file and relax the flags.
+	// TODO(moisesvega): Create a small domain object called Users that will contain the list of users
+	// and their differentials and reviews.
+
 	setFlags(cmd.Flags(), r.cfg)
 	return cmd
 }

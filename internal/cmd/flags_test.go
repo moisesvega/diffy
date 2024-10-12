@@ -13,34 +13,17 @@ import (
 func TestNewFlagSet(t *testing.T) {
 	users := []string{"first", "second"}
 	usersString := strings.Join(users, ",")
-	token := "someToken"
-	url := "https://example.com"
-	somePath := "/home/some/path"
 	give := []string{
 		"--settings",
 		// Users
 		"--phab_users=" + usersString,
 		"--github_users=" + usersString,
-
-		//  Phab configuration
-		"--phab_url=" + url,
-		"--phab_api_token=" + token,
-		"--phab_access_token=" + token,
-		"--arrc_file=" + somePath,
 	}
 
 	want := &config.Config{
 		Settings:    true,
 		PhabUsers:   users,
 		GithubUsers: users,
-		APIs: config.APIs{
-			Phabricator: config.Phabricator{
-				URL:           url,
-				APIToken:      token,
-				AccessToken:   token,
-				ArcrcFilePath: somePath,
-			},
-		},
 	}
 
 	got := &config.Config{}

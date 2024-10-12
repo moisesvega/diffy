@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 
 	"github.com/adrg/xdg"
+	"github.com/moisesvega/diffy/internal/client/phabricator"
 	"github.com/moisesvega/diffy/internal/config"
 	"github.com/moisesvega/diffy/internal/editor"
-	"github.com/moisesvega/diffy/internal/phabricator"
 )
 
 type runner struct {

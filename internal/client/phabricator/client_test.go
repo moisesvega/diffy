@@ -9,7 +9,6 @@ import (
 )
 
 func TestNew(t *testing.T) {
-
 	t.Run("success", func(t *testing.T) {
 		s := server.New()
 		t.Cleanup(s.Close)
