@@ -13,12 +13,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type Client interface {
-	// GetUsers returns a list of users with their differentials and reviews.
-	GetUsers(strings []string) ([]*User, error)
-}
-
-type client struct {
+type Client struct {
 	conn igonduit
 }
 
@@ -32,10 +27,10 @@ var (
 	errNoURLProvided      = errors.New("no URL provided")
 )
 
-// New creates a new Phabricator client
-func New(cfg config.Phabricator) (Client, error) {
+// New creates a new Phabricator Client
+func New(cfg config.Phabricator) (*Client, error) {
 	conn, err := createConnection(cfg)
-	return &client{conn: conn}, err
+	return &Client{conn: conn}, err
 }
 
 func createConnection(cfg config.Phabricator) (*gonduit.Conn, error) {
@@ -72,7 +67,7 @@ func createConnection(cfg config.Phabricator) (*gonduit.Conn, error) {
 }
 
 // GetUsers returns a list of users with their differentials and reviews.
-func (c *client) GetUsers(names []string) ([]*User, error) {
+func (c *Client) GetUsers(names []string) ([]*User, error) {
 	res, err := c.conn.UserQuery(requests.UserQueryRequest{
 		Usernames: names,
 	})
@@ -83,6 +78,7 @@ func (c *client) GetUsers(names []string) ([]*User, error) {
 	for _, user := range *res {
 		users = append(users, &User{User: user})
 	}
+	
 	for _, u := range users {
 		diffs, err := c.conn.DifferentialQuery(requests.DifferentialQueryRequest{
 			Authors: []string{u.PHID},
@@ -102,16 +98,3 @@ func (c *client) GetUsers(names []string) ([]*User, error) {
 	}
 	return users, nil
 }
-
-// type whoamiresponse struct {
-// 	PHID  string `json:"phid"`
-// 	Email string `json:"email"`
-// }
-//
-// func (c *client) CheckConnection() error {
-// 	whoami := whoamiresponse{}
-// 	if err := c.conn.Call("user.whoami", &requests.Request{}, &whoami); err != nil {
-// 		return fmt.Errorf("unable to call user.whoami: %w", err)
-// 	}
-// 	return nil
-// }
