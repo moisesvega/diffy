@@ -19,6 +19,3 @@ teams:
             - <replace_me>
         github_users:
             - <replace_me>
-settings: false
-phabusers: []
-githubusers: []

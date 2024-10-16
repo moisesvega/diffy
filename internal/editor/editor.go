@@ -16,7 +16,7 @@ type Controller struct {
 	Out, Err io.Writer
 
 	// command is the function used to run the editor command
-	// It is a variable in order to be able to mock it in tests
+	// It is a variable in order to be able to editormock it in tests
 	command func(command string, args ...string) *exec.Cmd
 }
 

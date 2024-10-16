@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/moisesvega/diffy/internal/config"
+	"github.com/moisesvega/diffy/internal/editor"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +18,8 @@ func Main() *cobra.Command {
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			r := &runner{
-				opts: *o,
+				opts:   *o,
+				editor: editor.New(os.Stdin, os.Stdout, os.Stderr),
 			}
 			return r.run(cmd.Flags().Args(), config.DefaultConfiguration())
 		},

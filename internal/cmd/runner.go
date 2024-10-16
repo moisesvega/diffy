@@ -4,16 +4,16 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/adrg/xdg"
 	"github.com/moisesvega/diffy/internal/client/phabricator"
 	"github.com/moisesvega/diffy/internal/config"
 	"github.com/moisesvega/diffy/internal/editor"
+	"gopkg.in/yaml.v3"
 )
 
 type runner struct {
 	opts        opts
-	phabricator phabricator.Client
 	editor      editor.Open
+	phabricator phabricator.Client
 }
 
 const (
@@ -26,16 +26,41 @@ var (
 )
 
 func (r *runner) run(args []string, cfg *config.Config) error {
-	if r.opts.Settings {
-		return openAndEditConfigFile()
+	if r.opts.settings {
+		return openAndEditConfigFile(r.editor)
 	}
 	return nil
 }
 
-func openAndEditConfigFile() error {
-	configFilePath, err := xdg.ConfigFile(settingsFilePath)
+const _XDGConfigHome = "XDG_CONFIG_HOME"
+
+func openAndEditConfigFile(e editor.Open) error {
+	configFilePath := filepath.Join(os.Getenv(_XDGConfigHome), settingsFilePath)
+	// if the file does not exist, create it with the default configuration
+	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
+		if err := createDefaultConfigFile(configFilePath); err != nil {
+			return err
+		}
+	}
+	return e.OpenFile(configFilePath)
+}
+
+func createDefaultConfigFile(path string) error {
+	// create the file
+	if err := os.MkdirAll(filepath.Dir(path), 0770); err != nil {
+		return err
+	}
+	f, err := os.Create(path)
 	if err != nil {
 		return err
 	}
-	return editor.New(os.Stdin, os.Stdout, os.Stderr).OpenFile(configFilePath)
+	defer f.Close()
+	// write the default configuration
+	config.DefaultConfiguration()
+	out, err := yaml.Marshal(config.DefaultConfiguration())
+	if err != nil {
+		return err
+	}
+	_, err = f.Write(out)
+	return err
 }

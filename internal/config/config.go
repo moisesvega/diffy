@@ -12,10 +12,6 @@ type Config struct {
 	Me    Me    `yaml:"me"`
 	APIs  APIs  `yaml:"apis"`
 	Teams Teams `yaml:"teams"`
-	// Use for the CLI
-	Settings    bool
-	PhabUsers   []string
-	GithubUsers []string
 }
 
 type Me struct {

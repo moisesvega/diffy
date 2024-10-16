@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/moisesvega/diffy/internal/config"
 	"github.com/spf13/pflag"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -20,13 +19,13 @@ func TestNewFlagSet(t *testing.T) {
 		"--github_users=" + usersString,
 	}
 
-	want := &config.Config{
-		Settings:    true,
-		PhabUsers:   users,
-		GithubUsers: users,
+	want := &opts{
+		settings:    true,
+		phabUsers:   users,
+		githubUsers: users,
 	}
 
-	got := &config.Config{}
+	got := &opts{}
 	pfs := pflag.NewFlagSet("new", pflag.ExitOnError)
 	require.NotPanics(t, func() {
 		setFlags(pfs, got)
