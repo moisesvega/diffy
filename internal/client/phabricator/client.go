@@ -9,6 +9,7 @@ import (
 	"github.com/moisesvega/diffy/internal/mapper"
 	"github.com/moisesvega/diffy/internal/model"
 	"github.com/uber/gonduit"
+	"github.com/uber/gonduit/constants"
 	"github.com/uber/gonduit/core"
 	"github.com/uber/gonduit/requests"
 	"golang.org/x/oauth2"
@@ -78,9 +79,8 @@ func (c *Client) GetUsers(names []string) ([]*model.User, error) {
 	users := make([]*model.User, 0, len(*res))
 	for _, user := range *res {
 		u := mapper.FromPhabricatorUser(user)
-		// We query for differentials and reviews by user PHID.
-		// if we send the whole PHID list, the API will query as if it was an AND query.
-		// This is a limitation of the Phabricator API.
+		// Then we query for differentials and reviews by user PHID.
+		// TODO(moisesvega): If I see degradation in performance, I will consider get all differentials and reviews in one call.
 		if u.Differentials, err = c.getDifferentials(user.PHID); err != nil {
 			return nil, err
 		}
@@ -94,7 +94,8 @@ func (c *Client) GetUsers(names []string) ([]*model.User, error) {
 
 func (c *Client) getDifferentials(id string) ([]*model.Differential, error) {
 	res, err := c.conn.DifferentialQuery(requests.DifferentialQueryRequest{
-		PHIDs: []string{id},
+		Status: constants.DifferentialStatusLegacyPublished,
+		PHIDs:  []string{id},
 	})
 	if err != nil {
 		return nil, err

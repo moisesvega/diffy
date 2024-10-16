@@ -26,10 +26,6 @@ func Main() *cobra.Command {
 			return r.run(cmd.Flags().Args())
 		},
 	}
-
-	// TODO(moisesvega): Create a small domain object called Users that will contain the list of users
-	// and their differentials and reviews.
-
 	setFlags(cmd.Flags(), r.cfg)
 	return cmd
 }

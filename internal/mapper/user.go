@@ -1,6 +1,8 @@
 package mapper
 
 import (
+	"time"
+
 	"github.com/moisesvega/diffy/internal/model"
 	"github.com/uber/gonduit/entities"
 	"github.com/uber/gonduit/responses"
@@ -18,9 +20,13 @@ func FromPhabricatorUser(in entities.User) *model.User {
 // FromPhabricatorDifferential maps an entities.DifferentialRevision to a model.Differential.
 func FromPhabricatorDifferential(in entities.DifferentialRevision) *model.Differential {
 	return &model.Differential{
-		ID:        in.PHID,
-		Title:     in.Title,
-		LineCount: in.LineCount,
+		ID:         in.ID,
+		Title:      in.Title,
+		LineCount:  in.LineCount,
+		Status:     in.StatusName,
+		URI:        in.URI,
+		CreatedAt:  time.Time(in.DateCreated),
+		ModifiedAt: time.Time(in.DateModified),
 	}
 }
 
