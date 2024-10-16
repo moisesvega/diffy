@@ -5,9 +5,11 @@ type User struct {
 	Email         string
 	ID            string
 	Differentials []*Differential
+	Reviews       []*Differential
 }
 
 type Differential struct {
-	ID    string
-	Title string
+	ID        string
+	Title     string
+	LineCount string
 }

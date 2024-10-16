@@ -6,20 +6,16 @@ import (
 	"os"
 
 	"github.com/moisesvega/diffy/internal/config"
+	"github.com/moisesvega/diffy/internal/mapper"
+	"github.com/moisesvega/diffy/internal/model"
 	"github.com/uber/gonduit"
 	"github.com/uber/gonduit/core"
 	"github.com/uber/gonduit/requests"
-	"github.com/uber/gonduit/responses"
 	"golang.org/x/oauth2"
 )
 
 type Client struct {
-	conn igonduit
-}
-
-type igonduit interface {
-	UserQuery(req requests.UserQueryRequest) (*responses.UserQueryResponse, error)
-	DifferentialQuery(req requests.DifferentialQueryRequest) (*responses.DifferentialQueryResponse, error)
+	conn *gonduit.Conn
 }
 
 var (
@@ -67,34 +63,51 @@ func createConnection(cfg config.Phabricator) (*gonduit.Conn, error) {
 }
 
 // GetUsers returns a list of users with their differentials and reviews.
-func (c *Client) GetUsers(names []string) ([]*User, error) {
+func (c *Client) GetUsers(names []string) ([]*model.User, error) {
+	// We can't query for differentials and reviews by username.
+	// We need to query for users first and then query for differentials and reviews by user PHID.
+	// This is a limitation of the Phabricator API.
+	// First we query for users.
+	// Then we query for differentials and reviews by user PHID.
 	res, err := c.conn.UserQuery(requests.UserQueryRequest{
 		Usernames: names,
 	})
 	if err != nil {
 		return nil, err
 	}
-	users := make([]*User, len(*res))
+	users := make([]*model.User, 0, len(*res))
 	for _, user := range *res {
-		users = append(users, &User{User: user})
-	}
-	
-	for _, u := range users {
-		diffs, err := c.conn.DifferentialQuery(requests.DifferentialQueryRequest{
-			Authors: []string{u.PHID},
-		})
-		if err != nil {
+		u := mapper.FromPhabricatorUser(user)
+		// We query for differentials and reviews by user PHID.
+		// if we send the whole PHID list, the API will query as if it was an AND query.
+		// This is a limitation of the Phabricator API.
+		if u.Differentials, err = c.getDifferentials(user.PHID); err != nil {
 			return nil, err
 		}
-		u.Differentials = *diffs
-
-		reviews, err := c.conn.DifferentialQuery(requests.DifferentialQueryRequest{
-			Reviewers: []string{u.PHID},
-		})
-		if err != nil {
+		if u.Reviews, err = c.getReviews(user.PHID); err != nil {
 			return nil, err
 		}
-		u.Reviews = *reviews
+		users = append(users, u)
 	}
 	return users, nil
+}
+
+func (c *Client) getDifferentials(id string) ([]*model.Differential, error) {
+	res, err := c.conn.DifferentialQuery(requests.DifferentialQueryRequest{
+		PHIDs: []string{id},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return mapper.FromPhabricatorDifferentialQueryResponse(*res), nil
+}
+
+func (c *Client) getReviews(id string) ([]*model.Differential, error) {
+	res, err := c.conn.DifferentialQuery(requests.DifferentialQueryRequest{
+		Reviewers: []string{id},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return mapper.FromPhabricatorDifferentialQueryResponse(*res), nil
 }
