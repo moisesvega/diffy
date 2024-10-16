@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"io"
-	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/adrg/xdg"
@@ -12,11 +11,7 @@ import (
 )
 
 type runner struct {
-	stdin  io.Reader
-	stdout io.Writer
-	stderr io.Writer
-
-	cfg         *config.Config
+	opts        opts
 	phabricator phabricator.Client
 	editor      editor.Open
 }
@@ -30,14 +25,17 @@ var (
 	settingsFilePath = filepath.Join(_name, _settingsFileName)
 )
 
-func (r *runner) run(args []string) (err error) {
-	if r.cfg.Settings {
-		configFilePath, err := xdg.ConfigFile(settingsFilePath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println("Save the config file at:", configFilePath)
-		return r.editor.OpenFile(configFilePath)
+func (r *runner) run(args []string, cfg *config.Config) error {
+	if r.opts.Settings {
+		return openAndEditConfigFile()
 	}
 	return nil
+}
+
+func openAndEditConfigFile() error {
+	configFilePath, err := xdg.ConfigFile(settingsFilePath)
+	if err != nil {
+		return err
+	}
+	return editor.New(os.Stdin, os.Stdout, os.Stderr).OpenFile(configFilePath)
 }
