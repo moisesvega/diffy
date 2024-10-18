@@ -15,7 +15,7 @@ import (
 
 func TestRunner(t *testing.T) {
 	r := &runner{}
-	err := r.run([]string{}, nil)
+	err := r.run([]string{})
 	require.NoError(t, err)
 }
 
@@ -35,14 +35,16 @@ func TestOpenSettings(t *testing.T) {
 			settings: true,
 		},
 		editor: mock,
+		config: config.New(),
 	}
 
-	err := r.run([]string{}, nil)
+	err := r.run([]string{})
 	require.NoError(t, err)
 	require.NotNil(t, r)
 	assert.FileExists(t, pathToSettings)
 	f, err := os.ReadFile(pathToSettings)
 	require.NoError(t, err)
+	// TODO(moisesvega): Update the test and use fake configuration controller
 	got := &config.Config{}
 	require.NoError(t, yaml.Unmarshal(f, got))
 	assert.EqualValues(t, config.DefaultConfiguration(), got)

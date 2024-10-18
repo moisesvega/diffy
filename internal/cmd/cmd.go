@@ -20,8 +20,9 @@ func Main() *cobra.Command {
 			r := &runner{
 				opts:   *o,
 				editor: editor.New(os.Stdin, os.Stdout, os.Stderr),
+				config: config.New(),
 			}
-			return r.run(cmd.Flags().Args(), config.DefaultConfiguration())
+			return r.run(cmd.Flags().Args())
 		},
 	}
 	setFlags(cmd.Flags(), o)

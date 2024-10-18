@@ -1,12 +1,5 @@
 package config
 
-import (
-	"fmt"
-	"os"
-
-	"gopkg.in/yaml.v3"
-)
-
 // Config root configuration structure
 type Config struct {
 	Me    Me    `yaml:"me"`
@@ -47,31 +40,8 @@ type Team struct {
 	GithubUsers      []string `yaml:"github_users"`
 }
 
-// ReadConfiguration from a given filepath
-func ReadConfiguration(filepath string) (*Config, error) {
-	yamlFile, err := os.ReadFile(filepath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read configuration file %s: %w", filepath, err)
-	}
-	cfg := &Config{}
-	if err := yaml.Unmarshal(yamlFile, cfg); err != nil {
-		return nil, fmt.Errorf("unable to parse config.yaml: %w", err)
-	}
-	return cfg, nil
-}
-
-const (
-	_replaceMe                     = "<replace_me>"
-	_defaultPhabricatorAPITokenEnv = "PHAB_API_TOKEN"
-	_defaultPhabricatorAccessToken = "PHAB_ACCESS_TOKEN"
-	_defaultArcanistFilePath       = "~/.arcrc"
-
-	_defaultGithubURL         = "https://github.com/"
-	_defaultGithubAPITokenEnv = "GITHUB_API_TOKEN"
-)
-
-// DefaultConfiguration returns default configuration.
-func DefaultConfiguration() *Config {
+// defaultConfiguration returns default configuration.
+func defaultConfiguration() *Config {
 	return &Config{
 		Me: Me{
 			PhabricatorUsername: _replaceMe,
