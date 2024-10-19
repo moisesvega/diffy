@@ -31,7 +31,7 @@ func New(cfg config.Phabricator) (*Client, error) {
 }
 
 func createConnection(cfg config.Phabricator) (*gonduit.Conn, error) {
-	if len(cfg.APIToken) == 0 && len(cfg.APITokenEnv) == 0 && len(cfg.ArcrcFilePath) == 0 {
+	if len(cfg.APIToken) == 0 && len(cfg.APITokenEnv) == 0 {
 		return nil, errNoAPITokenProvided
 	}
 
@@ -45,13 +45,6 @@ func createConnection(cfg config.Phabricator) (*gonduit.Conn, error) {
 	}
 
 	apiToken := os.Getenv(cfg.APITokenEnv)
-	if len(cfg.ArcrcFilePath) > 0 {
-		var err error
-		apiToken, err = getArcToken(cfg.ArcrcFilePath)
-		if err != nil {
-			return nil, err
-		}
-	}
 	if len(cfg.APIToken) > 0 {
 		apiToken = cfg.APIToken
 	}
@@ -80,7 +73,7 @@ func (c *Client) GetUsers(names []string) ([]*model.User, error) {
 	for _, user := range *res {
 		u := mapper.FromPhabricatorUser(user)
 		// Then we query for differentials and reviews by user PHID.
-		// TODO(moisesvega): If I see degradation in performance, I will consider get all differentials and reviews in one call.
+		// TODO(moisesvega): If I see degradation in performance, I will consider
 		if u.Differentials, err = c.getDifferentials(user.PHID); err != nil {
 			return nil, err
 		}

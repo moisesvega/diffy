@@ -99,7 +99,7 @@ func TestController_ReadConfiguration(t *testing.T) {
 		fp := path.Join(dir, "not_found.yaml")
 		ctrl.mkdirAll = func(path string, perm os.FileMode) error {
 			assert.Equal(t, dir, path)
-			assert.Equal(t, fs.FileMode(_mode), perm)
+			assert.Equal(t, fs.FileMode(0o755), perm)
 			return want
 		}
 		err := ctrl.CreateDefaults(fp)
