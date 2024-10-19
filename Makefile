@@ -5,7 +5,7 @@ PROJECT_ROOT = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 MODULE_DIRS = .
 
 .PHONY: all
-all: build test
+all: lint build test
 
 .PHONY: build
 build:
@@ -19,7 +19,8 @@ test:
 cover:
 	@$(foreach dir,$(MODULE_DIRS), ( \
 		cd $(dir) && \
-		go test -race -coverprofile=cover.out -coverpkg=./... ./... \
+		go test -race -coverprofile=cover.out.tmp -coverpkg=./... ./... \
+		&& cat cover.out.tmp | grep -v "mock.go" > cover.out \
 		&& go tool cover -html=cover.out -o cover.html) &&) true
 
 .PHONY: tidy
