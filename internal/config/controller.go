@@ -16,7 +16,7 @@ const (
 
 	_defaultGithubURL         = "https://github.com/"
 	_defaultGithubAPITokenEnv = "GITHUB_API_TOKEN"
-	_mode                     = 0o666
+	_mode                     = os.FileMode(0o677)
 )
 
 // Operations is the interface for configuration operations.
@@ -65,7 +65,7 @@ func (c *Controller) Read(path string) (*Config, error) {
 // CreateDefaults creates a new default configuration file at the given path
 func (c *Controller) CreateDefaults(path string) error {
 	// create the file
-	if err := c.mkdirAll(filepath.Dir(path), _mode); err != nil {
+	if err := c.mkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
 	f, err := c.createFile(path)

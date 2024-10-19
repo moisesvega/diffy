@@ -13,16 +13,19 @@ import (
 )
 
 func TestRunner(t *testing.T) {
-	r := &runner{}
+	want := errors.New("sad")
+	r := &runner{
+		xdgConfig: func(s string) (string, error) {
+			return "", want
+		},
+	}
 	err := r.run([]string{})
-	require.NoError(t, err)
+	require.Error(t, err)
+	assert.ErrorIs(t, err, want)
 }
 
 func TestOpenSettings(t *testing.T) {
-	// Set the XDG_CONFIG_HOME environment variable to a temporary directory
-	// xdg.ConfigFile will use this directory to create the settings file
 	tmpDir := t.TempDir()
-	t.Setenv(_XDGConfigHome, tmpDir)
 
 	pathToSettings := filepath.Join(tmpDir, settingsFilePath)
 
@@ -37,6 +40,9 @@ func TestOpenSettings(t *testing.T) {
 		},
 		editor: emock,
 		config: cfgmock,
+		xdgConfig: func(s string) (string, error) {
+			return pathToSettings, nil
+		},
 	}
 
 	err := r.run([]string{})
@@ -45,24 +51,28 @@ func TestOpenSettings(t *testing.T) {
 }
 
 func TestOpenSettingsError(t *testing.T) {
-	tmpDir := t.TempDir()
-	t.Setenv(_XDGConfigHome, tmpDir)
+	t.Run("success", func(t *testing.T) {
+		tmpDir := t.TempDir()
 
-	pathToSettings := filepath.Join(tmpDir, settingsFilePath)
-	emock := editormock.NewMockOpen(gomock.NewController(t))
+		pathToSettings := filepath.Join(tmpDir, settingsFilePath)
+		emock := editormock.NewMockOpen(gomock.NewController(t))
 
-	want := errors.New("sad")
-	cfgmock := configmock.NewMockOperations(gomock.NewController(t))
-	cfgmock.EXPECT().CreateDefaults(pathToSettings).Return(want).Times(1)
-	r := &runner{
-		opts: opts{
-			settings: true,
-		},
-		editor: emock,
-		config: cfgmock,
-	}
+		want := errors.New("sad")
+		cfgmock := configmock.NewMockOperations(gomock.NewController(t))
+		cfgmock.EXPECT().CreateDefaults(pathToSettings).Return(want).Times(1)
+		r := &runner{
+			opts: opts{
+				settings: true,
+			},
+			editor: emock,
+			config: cfgmock,
+			xdgConfig: func(s string) (string, error) {
+				return pathToSettings, nil
+			},
+		}
 
-	err := r.run([]string{})
-	require.Error(t, err)
-	assert.ErrorIs(t, err, want)
+		err := r.run([]string{})
+		require.Error(t, err)
+		assert.ErrorIs(t, err, want)
+	})
 }

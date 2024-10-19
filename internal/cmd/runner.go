@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -14,6 +16,7 @@ type runner struct {
 	editor      editor.Open
 	phabricator phabricator.Client
 	config      config.Operations
+	xdgConfig   func(string) (string, error)
 }
 
 const (
@@ -22,25 +25,35 @@ const (
 )
 
 var (
-	settingsFilePath = filepath.Join(_name, _settingsFileName)
+	settingsFilePath  = filepath.Join(_name, _settingsFileName)
+	errConfigNotFound = errors.New("config file not found, please run `diffy --settings` to create one")
 )
 
 func (r *runner) run(args []string) error {
-	if r.opts.settings {
-		return r.openAndEditConfigFile(r.editor)
+	sPath, err := r.xdgConfig(settingsFilePath)
+	if err != nil {
+		return err
 	}
+	if r.opts.settings {
+		return r.openAndEditConfigFile(sPath)
+	}
+
+	_, err = r.config.Read(sPath)
+	if err != nil {
+		return errConfigNotFound
+	}
+
 	return nil
 }
 
-const _XDGConfigHome = "XDG_CONFIG_HOME"
-
-func (r *runner) openAndEditConfigFile(e editor.Open) error {
-	configFilePath := filepath.Join(os.Getenv(_XDGConfigHome), settingsFilePath)
+func (r *runner) openAndEditConfigFile(path string) error {
 	// if the file does not exist, create it with the default configuration
-	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
-		if err := r.config.CreateDefaults(configFilePath); err != nil {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		fmt.Println("Creating a new configuration file at", settingsFilePath)
+		if err := r.config.CreateDefaults(path); err != nil {
 			return err
 		}
 	}
-	return e.OpenFile(configFilePath)
+
+	return r.editor.OpenFile(path)
 }
