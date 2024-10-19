@@ -40,8 +40,8 @@ type Team struct {
 	GithubUsers      []string `yaml:"github_users"`
 }
 
-// defaultConfiguration returns default configuration.
-func defaultConfiguration() *Config {
+// DefaultConfiguration returns default configuration.
+func DefaultConfiguration() *Config {
 	return &Config{
 		Me: Me{
 			PhabricatorUsername: _replaceMe,

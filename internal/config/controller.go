@@ -22,7 +22,7 @@ const (
 // Operations is the interface for configuration operations.
 type Operations interface {
 	Read(path string) (*Config, error)
-	Create(path string) error
+	CreateDefaults(path string) error
 }
 
 // Controller is the configuration controller
@@ -62,8 +62,8 @@ func (c *Controller) Read(path string) (*Config, error) {
 	return cfg, nil
 }
 
-// Create creates a new default configuration file at the given path
-func (c *Controller) Create(path string) error {
+// CreateDefaults creates a new default configuration file at the given path
+func (c *Controller) CreateDefaults(path string) error {
 	// create the file
 	if err := c.mkdirAll(filepath.Dir(path), _mode); err != nil {
 		return err
@@ -74,7 +74,7 @@ func (c *Controller) Create(path string) error {
 	}
 	defer f.Close()
 	// write the default configuration to the file
-	out, err := c.yamMarshal(defaultConfiguration())
+	out, err := c.yamMarshal(DefaultConfiguration())
 	if err != nil {
 		return err
 	}

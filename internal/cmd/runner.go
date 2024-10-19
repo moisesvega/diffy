@@ -38,7 +38,7 @@ func (r *runner) openAndEditConfigFile(e editor.Open) error {
 	configFilePath := filepath.Join(os.Getenv(_XDGConfigHome), settingsFilePath)
 	// if the file does not exist, create it with the default configuration
 	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
-		if err := r.config.Create(configFilePath); err != nil {
+		if err := r.config.CreateDefaults(configFilePath); err != nil {
 			return err
 		}
 	}

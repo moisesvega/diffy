@@ -66,12 +66,12 @@ func TestReadConfigurationFileNotFound(t *testing.T) {
 }
 
 func TestWriteConfiguration(t *testing.T) {
-	defaults := defaultConfiguration()
+	defaults := DefaultConfiguration()
 	got, err := yaml.Marshal(defaults)
 	require.NoError(t, err)
 	require.NotEmpty(t, got)
 	// TODO(moisesvega): Uncomment this line to update the defaults.yaml file
-	// Create a small script to run this test and update the defaults.yaml file
+	// CreateDefaults a small script to run this test and update the defaults.yaml file
 	// os.WriteFile(path.Join("./testdata/defaults.yaml"), got, _mode)
 	want, err := os.ReadFile("./testdata/defaults.yaml")
 	require.NoError(t, err)
@@ -84,11 +84,11 @@ func TestController_ReadConfiguration(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		ctrl := New()
 		fp := path.Join(dir, "test.yaml")
-		require.NoError(t, ctrl.Create(fp))
+		require.NoError(t, ctrl.CreateDefaults(fp))
 		assert.FileExists(t, fp)
 		got, err := ctrl.Read(fp)
 		require.NoError(t, err)
-		want := defaultConfiguration()
+		want := DefaultConfiguration()
 		assert.EqualValues(t, want, got)
 	})
 
@@ -102,7 +102,7 @@ func TestController_ReadConfiguration(t *testing.T) {
 			assert.Equal(t, fs.FileMode(_mode), perm)
 			return want
 		}
-		err := ctrl.Create(fp)
+		err := ctrl.CreateDefaults(fp)
 		require.Error(t, err)
 	})
 
@@ -118,7 +118,7 @@ func TestController_ReadConfiguration(t *testing.T) {
 			assert.Equal(t, fp, name)
 			return nil, want
 		}
-		err := ctrl.Create(fp)
+		err := ctrl.CreateDefaults(fp)
 		require.Error(t, err)
 	})
 
@@ -137,7 +137,7 @@ func TestController_ReadConfiguration(t *testing.T) {
 		ctrl.yamMarshal = func(in interface{}) ([]byte, error) {
 			return nil, want
 		}
-		err := ctrl.Create(fp)
+		err := ctrl.CreateDefaults(fp)
 		require.Error(t, err)
 	})
 }

@@ -11,7 +11,7 @@ type opts struct {
 }
 
 func setFlags(fs *pflag.FlagSet, opts *opts) {
-	// TODO: Create proper descriptions
+	// TODO: CreateDefaults proper descriptions
 	fs.BoolVar(&opts.settings, "settings", false, "edit settings")
 	fs.StringSliceVar(&opts.phabUsers, "phab_users", nil, "List of phabricator users you want to track.")
 	fs.StringSliceVar(&opts.githubUsers, "github_users", nil, "List of github users you want to track.")

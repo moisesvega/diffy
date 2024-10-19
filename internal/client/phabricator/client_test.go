@@ -72,7 +72,7 @@ func TestClientRequiredConfig(t *testing.T) {
 const _userQueryMethod = "user.query"
 
 func TestClient_GetUsers(t *testing.T) {
-	// Create a test server
+	// CreateDefaults a test server
 	s := server.New()
 	// Close the server when the test finishes
 	t.Cleanup(s.Close)

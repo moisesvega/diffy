@@ -44,7 +44,7 @@ func TestOpenFile(t *testing.T) {
 const _fakeEnvVar = "GO_WANT_HELPER_PROCESS"
 
 func fakeExecCommand(command string, args ...string) *exec.Cmd {
-	// Create a fake command that will exit successfully
+	// CreateDefaults a fake command that will exit successfully
 	// This wil run the TestHelperProcess function
 	// and exit successfully
 	cs := []string{"-test.run=TestHelperProcess", "--", command}
