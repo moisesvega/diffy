@@ -8,7 +8,6 @@ apis:
         api_token_env: PHAB_API_TOKEN
         access_token: ""
         access_token_env: PHAB_ACCESS_TOKEN
-        arrc_file_path: ~/.arcrc
     github:
         base_url: https://github.com/
         api_token: ""

@@ -1,7 +1,0 @@
-{
-    "hosts":{
-        "https://code.phabricator-internal.com/api/": {
-            "token": "cli-token"
-        }
-    }
-}

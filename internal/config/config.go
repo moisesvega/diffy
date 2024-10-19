@@ -24,7 +24,6 @@ type Phabricator struct {
 	APITokenEnv    string `yaml:"api_token_env"`
 	AccessToken    string `yaml:"access_token"`
 	AccessTokenEnv string `yaml:"access_token_env"`
-	ArcrcFilePath  string `yaml:"arrc_file_path"`
 }
 
 type Github struct {
@@ -52,7 +51,6 @@ func DefaultConfiguration() *Config {
 				URL:            _replaceMe,
 				APITokenEnv:    _defaultPhabricatorAPITokenEnv,
 				AccessTokenEnv: _defaultPhabricatorAccessToken,
-				ArcrcFilePath:  _defaultArcanistFilePath,
 			},
 			Github: Github{
 				URL:         _defaultGithubURL,
