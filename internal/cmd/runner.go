@@ -42,7 +42,12 @@ func (r *runner) run(args []string) error {
 		return r.openAndEditConfigFile(sPath)
 	}
 
-	u, err := r.phabricator.GetUsers(args)
+	phab, err := phabricator.New(r.cfg.APIs.Phabricator)
+	if err != nil {
+		return err
+	}
+
+	u, err := phab.GetUsers(args)
 	if err != nil {
 		return err
 	}
