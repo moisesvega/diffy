@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/uber/gonduit/constants"
+)
 
 // User represents a Phabricator User.
 // This is a simplified version of the User entity from gonduit.
@@ -18,7 +22,8 @@ type Differential struct {
 	ID             string
 	Title          string
 	LineCount      string
-	Status         string
+	Status         constants.DifferentialStatusLegacy
+	StatusName     string
 	URI            string
 	CreatedAt      time.Time
 	ModifiedAt     time.Time

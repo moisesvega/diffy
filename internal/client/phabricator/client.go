@@ -86,7 +86,7 @@ func (c *Client) GetUsers(names []string) ([]*model.User, error) {
 
 func (c *Client) getDifferentials(id string) ([]*model.Differential, error) {
 	res, err := c.conn.DifferentialQuery(requests.DifferentialQueryRequest{
-		PHIDs: []string{id},
+		Authors: []string{id},
 	})
 	if err != nil {
 		return nil, err

@@ -2,7 +2,6 @@ package heatmap
 
 import (
 	"fmt"
-	"math/rand/v2"
 	"strconv"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 )
 
 const (
+	// TODO(moisesvega): Make it configurable
 	_zero           = "#11141A"
 	_low            = "#0e4429"
 	_mid            = "#006d32"
@@ -33,19 +33,21 @@ type reporter struct {
 const _timeLayout = "2006-01-02"
 
 func (r *reporter) Report(users []*model.User) error {
-
-	heatmap := make(map[string]int)
 	for _, user := range users {
-		for _, differential := range user.Differentials {
-			heatmap[differential.ModifiedAt.Format(_timeLayout)]++
-			differential.ModifiedAt.Day()
-		}
+		reportUser(user)
+	}
+	return nil
+}
+
+func reportUser(user *model.User) {
+	heatmap := make(map[string]int)
+	for _, differential := range user.Differentials {
+		heatmap[differential.ModifiedAt.Format(_timeLayout)]++
 	}
 
 	// TODO(moisesvega): Pass an option to set the date range
 	var since *time.Time
-	what := time.Date(2024, time.January, 1, 0, 0, 0, 0, time.Local)
-	// what := time.Now().AddDate(-1, 0, 0)
+	what := time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.Local)
 	since = &what
 
 	today := time.Now().AddDate(0, 0, -1)
@@ -73,14 +75,11 @@ func (r *reporter) Report(users []*model.User) error {
 	total := 0
 	for !yearAgo.After(today) {
 		yearAgo = yearAgo.AddDate(0, 0, 1)
-		count := rand.IntN(10)
+		count := 0
 		if v, ok := heatmap[yearAgo.Format(_timeLayout)]; ok {
 			count = v
 		}
 		diffCount := strconv.Itoa(count)
-		if count == 0 {
-			diffCount = ""
-		}
 		rows[yearAgo.Weekday()] = append(rows[yearAgo.Weekday()], diffCount)
 		if yearAgo.Month() != currentMonth {
 			currentMonth = yearAgo.Month()
@@ -111,7 +110,7 @@ func (r *reporter) Report(users []*model.User) error {
 			}
 
 			color := _zero
-			fontColor := _blackFontColor
+			fontColor := _whiteFontColor
 			switch {
 			case v >= 1 && v < 3:
 				color = _low
@@ -121,8 +120,10 @@ func (r *reporter) Report(users []*model.User) error {
 				fontColor = _grayFontColor
 			case v >= 5 && v < 7:
 				color = _high
+				fontColor = _blackFontColor
 			case v >= 7:
 				color = _max
+				fontColor = _blackFontColor
 			}
 
 			return lipgloss.NewStyle().
@@ -134,7 +135,6 @@ func (r *reporter) Report(users []*model.User) error {
 		Rows(rows...).Width(0).Headers(headers...)
 	fmt.Println(t)
 	fmt.Println("Total Differentials:" + strconv.Itoa(total))
-	return nil
 }
 
 func New() model.Reporter {

@@ -9,6 +9,9 @@ import (
 	"github.com/moisesvega/diffy/internal/client/phabricator"
 	"github.com/moisesvega/diffy/internal/config"
 	"github.com/moisesvega/diffy/internal/editor"
+	"github.com/moisesvega/diffy/internal/model"
+	"github.com/moisesvega/diffy/internal/reporter/heatmap"
+	"github.com/uber/gonduit/constants"
 )
 
 type runner struct {
@@ -39,13 +42,24 @@ func (r *runner) run(args []string) error {
 		return r.openAndEditConfigFile(sPath)
 	}
 
-	u, err := r.phabricator.GetUsers([]string{r.cfg.Me.PhabricatorUsername})
-	for _, user := range u {
-		for _, differential := range user.Differentials {
-			fmt.Println(differential)
-		}
+	u, err := r.phabricator.GetUsers(args)
+	if err != nil {
+		return err
 	}
-	return nil
+
+	// TODO(moisesvega): Create filters instead
+	for _, user := range u {
+		closed := make([]*model.Differential, 0)
+		for _, differential := range user.Differentials {
+			if differential.Status == constants.DifferentialStatusLegacyPublished {
+				closed = append(closed, differential)
+			}
+		}
+		user.Differentials = closed
+	}
+	// TODO(moisesvega): Make it configurable
+	hm := heatmap.New()
+	return hm.Report(u)
 }
 
 func (r *runner) openAndEditConfigFile(path string) error {
