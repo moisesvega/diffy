@@ -1,11 +1,10 @@
 package cmd
 
 import (
-	"os"
+	"time"
 
-	"github.com/adrg/xdg"
-	"github.com/moisesvega/diffy/internal/config"
-	"github.com/moisesvega/diffy/internal/editor"
+	"github.com/moisesvega/diffy/internal/model"
+	"github.com/moisesvega/diffy/internal/reporter/heatmap"
 	"github.com/spf13/cobra"
 )
 
@@ -18,15 +17,29 @@ func Main() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			r := &runner{
-				opts:      *o,
-				editor:    editor.New(os.Stdin, os.Stdout, os.Stderr),
-				config:    config.New(),
-				xdgConfig: xdg.ConfigFile,
-			}
-			return r.run(cmd.Flags().Args())
+			return nil
 		},
 	}
 	setFlags(cmd.Flags(), o)
+
+	hm := heatmap.New()
+	hm.Report([]model.User{
+		{
+			Username: "moisesvega",
+			Differentials: []*model.Differential{
+				{
+					ID:             "1",
+					Title:          "New",
+					LineCount:      "10",
+					Status:         "Nice",
+					URI:            "ww.example.com",
+					CreatedAt:      time.Now(),
+					ModifiedAt:     time.Now(),
+					RepositoryPHID: "",
+				},
+			},
+		},
+	})
+
 	return cmd
 }

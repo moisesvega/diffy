@@ -17,6 +17,7 @@ type runner struct {
 	phabricator phabricator.Client
 	config      config.Operations
 	xdgConfig   func(string) (string, error)
+	cfg         *config.Config
 }
 
 const (
@@ -38,11 +39,12 @@ func (r *runner) run(args []string) error {
 		return r.openAndEditConfigFile(sPath)
 	}
 
-	_, err = r.config.Read(sPath)
-	if err != nil {
-		return errConfigNotFound
+	u, err := r.phabricator.GetUsers([]string{r.cfg.Me.PhabricatorUsername})
+	for _, user := range u {
+		for _, differential := range user.Differentials {
+			fmt.Println(differential)
+		}
 	}
-
 	return nil
 }
 

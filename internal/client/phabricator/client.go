@@ -9,7 +9,6 @@ import (
 	"github.com/moisesvega/diffy/internal/mapper"
 	"github.com/moisesvega/diffy/internal/model"
 	"github.com/uber/gonduit"
-	"github.com/uber/gonduit/constants"
 	"github.com/uber/gonduit/core"
 	"github.com/uber/gonduit/requests"
 	"golang.org/x/oauth2"
@@ -87,8 +86,7 @@ func (c *Client) GetUsers(names []string) ([]*model.User, error) {
 
 func (c *Client) getDifferentials(id string) ([]*model.Differential, error) {
 	res, err := c.conn.DifferentialQuery(requests.DifferentialQueryRequest{
-		Status: constants.DifferentialStatusLegacyPublished,
-		PHIDs:  []string{id},
+		PHIDs: []string{id},
 	})
 	if err != nil {
 		return nil, err
