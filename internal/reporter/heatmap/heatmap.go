@@ -30,12 +30,15 @@ var style = lipgloss.NewStyle().
 type reporter struct {
 }
 
-func (r *reporter) Report(users []model.User) error {
+const _timeLayout = "2006-01-02"
 
-	heatmap := make(map[time.Time]int)
+func (r *reporter) Report(users []*model.User) error {
+
+	heatmap := make(map[string]int)
 	for _, user := range users {
 		for _, differential := range user.Differentials {
-			heatmap[differential.ModifiedAt]++
+			heatmap[differential.ModifiedAt.Format(_timeLayout)]++
+			differential.ModifiedAt.Day()
 		}
 	}
 
@@ -71,7 +74,7 @@ func (r *reporter) Report(users []model.User) error {
 	for !yearAgo.After(today) {
 		yearAgo = yearAgo.AddDate(0, 0, 1)
 		count := rand.IntN(10)
-		if v, ok := heatmap[yearAgo]; ok {
+		if v, ok := heatmap[yearAgo.Format(_timeLayout)]; ok {
 			count = v
 		}
 		diffCount := strconv.Itoa(count)
