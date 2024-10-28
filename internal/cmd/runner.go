@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 
 	"github.com/moisesvega/diffy/internal/client/phabricator"
 	"github.com/moisesvega/diffy/internal/config"
 	"github.com/moisesvega/diffy/internal/editor"
+	"github.com/moisesvega/diffy/internal/filter"
 	"github.com/moisesvega/diffy/internal/model"
 	"github.com/moisesvega/diffy/internal/reporter/heatmap"
-	"github.com/uber/gonduit/constants"
 )
 
 type runner struct {
@@ -52,17 +53,11 @@ func (r *runner) run(args []string) error {
 		return err
 	}
 
-	// TODO(moisesvega): Create filters instead
+	// filter out closed differentials and those with less than 10 lines
 	for _, user := range u {
-		closed := make([]*model.Differential, 0)
-		for _, differential := range user.Differentials {
-			if differential.Status == constants.DifferentialStatusLegacyPublished {
-				closed = append(closed, differential)
-			}
-		}
-		user.Differentials = closed
+		diffs := slices.DeleteFunc(user.Differentials, filter.ByStatus(model.Closed))
+		user.Differentials = slices.DeleteFunc(diffs, filter.ByLineCount(10))
 	}
-	// TODO(moisesvega): Make it configurable
 	hm := heatmap.New()
 	return hm.Report(u)
 }
@@ -75,6 +70,5 @@ func (r *runner) openAndEditConfigFile(path string) error {
 			return err
 		}
 	}
-
 	return r.editor.OpenFile(path)
 }
