@@ -14,24 +14,28 @@ import (
 
 func Main() *cobra.Command {
 	o := &opts{}
+	r := runner{
+		opts:      *o,
+		editor:    editor.New(os.Stdin, os.Stdout, os.Stderr),
+		config:    config.New(),
+		phabNew:   phabricator.New,
+		xdgConfig: xdg.ConfigFile,
+		reporters: []model.Reporter{heatmap.New()},
+	}
 	cmd := &cobra.Command{
 		Use:           "diffy",
 		Short:         "CLI designed to deliver comprehensive statistics and insights from code reviews and differential analysis",
 		Example:       "",
 		SilenceUsage:  true,
 		SilenceErrors: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			r := runner{
-				opts:      *o,
-				editor:    editor.New(os.Stdin, os.Stdout, os.Stderr),
-				config:    config.New(),
-				phabNew:   phabricator.New,
-				xdgConfig: xdg.ConfigFile,
-				reporters: []model.Reporter{heatmap.New()},
-			}
-			return r.run(cmd.Flags().Args())
-		},
 	}
 	setFlags(cmd.Flags(), o)
+	cmd.RunE = runE(&r)
 	return cmd
+}
+
+func runE(r *runner) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		return r.run(cmd.Flags().Args())
+	}
 }
