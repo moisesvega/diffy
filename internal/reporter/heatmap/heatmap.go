@@ -2,6 +2,7 @@ package heatmap
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"time"
@@ -52,9 +53,10 @@ func (r *reporter) Report(users []*model.User, option ...model.ReporterOption) e
 }
 
 func (r *reporter) reportUser(user *model.User, opts *model.ReporterOptions) error {
-	w := opts.Writer
-	if opts.Writer == nil {
-		w = os.Stdout
+	var w io.Writer
+	w = os.Stdout
+	if opts.Writer != nil {
+		w = opts.Writer
 	}
 	heatmap := make(map[string]int)
 	for _, differential := range user.Differentials {
@@ -68,10 +70,9 @@ func (r *reporter) reportUser(user *model.User, opts *model.ReporterOptions) err
 	if opts.Since != nil {
 		since = *opts.Since
 	}
-
 	// We need to find the first Sunday of the year
 	for since.Weekday() != time.Saturday {
-		since = since.AddDate(0, 0, +1)
+		since = since.AddDate(0, 0, -1)
 	}
 
 	// We'll create a heatmap with the days of the week as columns
@@ -109,7 +110,7 @@ func (r *reporter) reportUser(user *model.User, opts *model.ReporterOptions) err
 		BorderStyle(lipgloss.NewStyle().Background(lipgloss.Color(_background)).Width(0)).
 		StyleFunc(styleFn(rows)).
 		Rows(rows...).Width(0).Headers(headers...)
-	_, err := fmt.Fprint(w, t.Render(), "\n")
+	_, err := fmt.Fprint(w, "\n", t.Render(), "\n")
 	return err
 }
 
