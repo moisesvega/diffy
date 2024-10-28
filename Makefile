@@ -1,11 +1,10 @@
 # Directory containing the Makefile.
 PROJECT_ROOT = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-# Directories containing independent Go modules.
-MODULE_DIRS = .
+MOCKGEN = bin/mockgen
 
 .PHONY: all
-all: lint build test
+all: build lint test
 
 .PHONY: build
 build:
@@ -13,26 +12,27 @@ build:
 
 .PHONY: test
 test:
-	@$(foreach dir,$(MODULE_DIRS),(cd $(dir) && go test -race ./...) &&) true
+	go test ./...
 
 .PHONY: cover
 cover:
-	@$(foreach dir,$(MODULE_DIRS), ( \
-		cd $(dir) && \
-		go test -race -coverprofile=cover.out.tmp -coverpkg=./... ./... \
-		&& cat cover.out.tmp | grep -v "mock.go" > cover.out \
-		&& go tool cover -html=cover.out -o cover.html) &&) true
+	#	ignore mock.go files
+	go test -race -coverprofile=cover.out.tmp -coverpkg=./... ./... \
+	&& cat cover.out.tmp | grep -v "mock.go" > cover.out \
+	&& go tool cover -html=cover.out -o cover.html
 
 .PHONY: tidy
 tidy:
-	@$(foreach dir,$(MODULES),(cd $(dir) && go mod tidy) &&) true
+	go mod tidy
 
 .PHONY: lint
-lint: golangci-lint
+lint:
+	golangci-lint run
 
-.PHONY: golangci-lint
-golangci-lint:
-	@$(foreach mod,$(MODULE_DIRS), \
-		(cd $(mod) && \
-		echo "[lint] golangci-lint: $(mod)" && \
-		golangci-lint run --path-prefix $(mod)) &&) true
+.PHONY: generate
+generate: $(TOOLS)
+	go generate -x ./...
+	make -C doc generate
+
+$(MOCKGEN): go.mod
+	go install go.uber.org/mock/mockgen

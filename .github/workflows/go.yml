@@ -4,7 +4,6 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -25,3 +24,9 @@ jobs:
 
       - name: Test
         run: make cover
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4.6.0
+        with:
+          files: ./cover.out
+          token: ${{ secrets.CODECOV_TOKEN }}
