@@ -1,6 +1,3 @@
-me:
-    phabricator: <replace_me>
-    github: <replace_me>
 apis:
     phabricator:
         base_url: <replace_me>
@@ -8,10 +5,6 @@ apis:
         api_token_env: PHAB_API_TOKEN
         access_token: ""
         access_token_env: PHAB_ACCESS_TOKEN
-    github:
-        base_url: https://github.com/
-        api_token: ""
-        api_token_env: GITHUB_API_TOKEN
 teams:
     a_team:
         phabricator_users:

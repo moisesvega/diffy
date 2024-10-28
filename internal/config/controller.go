@@ -12,11 +12,7 @@ const (
 	_replaceMe                     = "<replace_me>"
 	_defaultPhabricatorAPITokenEnv = "PHAB_API_TOKEN"
 	_defaultPhabricatorAccessToken = "PHAB_ACCESS_TOKEN"
-	_defaultArcanistFilePath       = "~/.arcrc"
-
-	_defaultGithubURL         = "https://github.com/"
-	_defaultGithubAPITokenEnv = "GITHUB_API_TOKEN"
-	_mode                     = os.FileMode(0o677)
+	_mode                          = os.FileMode(0o677)
 )
 
 // Operations is the interface for configuration operations.
