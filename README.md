@@ -1,6 +1,6 @@
 
 
-[![CI](https://github.com/moisesvega/diffy/actions/workflows/go.yml/badge.svg)](https://github.com/moisesvega/diffy/actions/workflows/go.yml)
+[![CI](https://github.com/moisesvega/diffy/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/moisesvega/diffy/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/moisesvega/diffy/graph/badge.svg?token=FNAXMLNR2D)](https://codecov.io/gh/moisesvega/diffy)
 
 # Diffy
