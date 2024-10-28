@@ -13,9 +13,7 @@ import (
 )
 
 func Main() *cobra.Command {
-	o := &opts{}
 	r := runner{
-		opts:      *o,
 		editor:    editor.New(os.Stdin, os.Stdout, os.Stderr),
 		config:    config.New(),
 		phabNew:   phabricator.New,
@@ -29,13 +27,15 @@ func Main() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+	o := &opts{}
 	setFlags(cmd.Flags(), o)
-	cmd.RunE = runE(&r)
+	cmd.RunE = runE(&r, o)
 	return cmd
 }
 
-func runE(r *runner) func(cmd *cobra.Command, args []string) error {
+func runE(r *runner, o *opts) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
+		r.opts = *o
 		return r.run(cmd.Flags().Args())
 	}
 }

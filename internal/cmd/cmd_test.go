@@ -26,7 +26,7 @@ func TestRunE(t *testing.T) {
 			return "", want
 		},
 	}
-	f := runE(r)
+	f := runE(r, &opts{})
 	require.NotNil(t, f)
 	require.NotPanics(t, func() {
 		err := f(&cobra.Command{}, []string{})
