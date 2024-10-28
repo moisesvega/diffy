@@ -14,9 +14,6 @@ import (
 
 func TestReadConfiguration(t *testing.T) {
 	file := `
-me:
-    phabricator: <replace_me>
-    github: <replace_me>
 apis:
     phabricator:
         base_url: <replace_me>
@@ -29,12 +26,6 @@ apis:
         base_url: https://github.com/
         api_token: ""
         api_token_env: GITHUB_API_TOKEN
-teams:
-    a_team:
-        phabricator_users:
-            - <replace_me>
-        github_users:
-            - <replace_me>
 `
 	fp := path.Join(t.TempDir(), "test.yaml")
 	require.NoError(t, os.WriteFile(fp, []byte(file), _mode))

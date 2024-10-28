@@ -14,7 +14,11 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type Client struct {
+type Client interface {
+	GetUsers(names []string) ([]*model.User, error)
+}
+
+type client struct {
 	conn *gonduit.Conn
 }
 
@@ -23,10 +27,10 @@ var (
 	errNoURLProvided      = errors.New("no URL provided")
 )
 
-// New creates a new Phabricator Client
-func New(cfg config.Phabricator) (*Client, error) {
+// New creates a new Phabricator client
+func New(cfg config.Phabricator) (Client, error) {
 	conn, err := createConnection(cfg)
-	return &Client{conn: conn}, err
+	return &client{conn: conn}, err
 }
 
 func createConnection(cfg config.Phabricator) (*gonduit.Conn, error) {
@@ -56,7 +60,7 @@ func createConnection(cfg config.Phabricator) (*gonduit.Conn, error) {
 }
 
 // GetUsers returns a list of users with their differentials and reviews.
-func (c *Client) GetUsers(names []string) ([]*model.User, error) {
+func (c *client) GetUsers(names []string) ([]*model.User, error) {
 	// We can't query for differentials and reviews by username.
 	// We need to query for users first and then query for differentials and reviews by user PHID.
 	// This is a limitation of the Phabricator API.
@@ -84,7 +88,7 @@ func (c *Client) GetUsers(names []string) ([]*model.User, error) {
 	return users, nil
 }
 
-func (c *Client) getDifferentials(id string) ([]*model.Differential, error) {
+func (c *client) getDifferentials(id string) ([]*model.Differential, error) {
 	res, err := c.conn.DifferentialQuery(requests.DifferentialQueryRequest{
 		Authors: []string{id},
 	})
@@ -94,7 +98,7 @@ func (c *Client) getDifferentials(id string) ([]*model.Differential, error) {
 	return mapper.FromPhabricatorDifferentialQueryResponse(*res), nil
 }
 
-func (c *Client) getReviews(id string) ([]*model.Differential, error) {
+func (c *client) getReviews(id string) ([]*model.Differential, error) {
 	res, err := c.conn.DifferentialQuery(requests.DifferentialQueryRequest{
 		Reviewers: []string{id},
 	})

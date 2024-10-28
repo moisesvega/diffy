@@ -7,6 +7,8 @@ import (
 	"github.com/moisesvega/diffy/internal/client/phabricator"
 	"github.com/moisesvega/diffy/internal/config"
 	"github.com/moisesvega/diffy/internal/editor"
+	"github.com/moisesvega/diffy/internal/model"
+	"github.com/moisesvega/diffy/internal/reporter/heatmap"
 	"github.com/spf13/cobra"
 )
 
@@ -25,6 +27,7 @@ func Main() *cobra.Command {
 				config:    config.New(),
 				phabNew:   phabricator.New,
 				xdgConfig: xdg.ConfigFile,
+				reporters: []model.Reporter{heatmap.New()},
 			}
 			return r.run(cmd.Flags().Args())
 		},

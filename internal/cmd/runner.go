@@ -12,15 +12,15 @@ import (
 	"github.com/moisesvega/diffy/internal/editor"
 	"github.com/moisesvega/diffy/internal/filter"
 	"github.com/moisesvega/diffy/internal/model"
-	"github.com/moisesvega/diffy/internal/reporter/heatmap"
 )
 
 type runner struct {
 	opts      opts
 	editor    editor.Open
-	phabNew   func(config.Phabricator) (*phabricator.Client, error)
+	phabNew   func(config.Phabricator) (phabricator.Client, error)
 	config    config.Operations
 	xdgConfig func(string) (string, error)
+	reporters []model.Reporter
 }
 
 const (
@@ -62,8 +62,14 @@ func (r *runner) run(args []string) error {
 		diffs := slices.DeleteFunc(user.Differentials, filter.ByStatus(model.Closed))
 		user.Differentials = slices.DeleteFunc(diffs, filter.MinLineCount(10))
 	}
-	hm := heatmap.New()
-	return hm.Report(u)
+
+	// report the data
+	for _, reporter := range r.reporters {
+		if err := reporter.Report(u); err != nil {
+			return fmt.Errorf("failed to report: %w", err)
+		}
+	}
+	return nil
 }
 
 func (r *runner) openAndEditConfigFile(path string) error {

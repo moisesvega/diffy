@@ -2,12 +2,7 @@ package config
 
 // Config root configuration structure
 type Config struct {
-	APIs  APIs  `yaml:"apis"`
-	Teams Teams `yaml:"teams"`
-}
-
-type Me struct {
-	PhabricatorUsername string `yaml:"phabricator"`
+	APIs APIs `yaml:"apis"`
 }
 
 type APIs struct {
@@ -23,13 +18,6 @@ type Phabricator struct {
 	AccessTokenEnv string `yaml:"access_token_env"`
 }
 
-type Teams map[string]Team
-
-type Team struct {
-	PhabricatorUsers []string `yaml:"phabricator_users"`
-	GithubUsers      []string `yaml:"github_users"`
-}
-
 // DefaultConfiguration returns default configuration.
 func DefaultConfiguration() *Config {
 	return &Config{
@@ -38,16 +26,6 @@ func DefaultConfiguration() *Config {
 				URL:            _replaceMe,
 				APITokenEnv:    _defaultPhabricatorAPITokenEnv,
 				AccessTokenEnv: _defaultPhabricatorAccessToken,
-			},
-		},
-		Teams: Teams{
-			"a_team": Team{
-				PhabricatorUsers: []string{
-					_replaceMe,
-				},
-				GithubUsers: []string{
-					_replaceMe,
-				},
 			},
 		},
 	}

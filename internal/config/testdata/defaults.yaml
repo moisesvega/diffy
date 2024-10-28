@@ -5,9 +5,3 @@ apis:
         api_token_env: PHAB_API_TOKEN
         access_token: ""
         access_token_env: PHAB_ACCESS_TOKEN
-teams:
-    a_team:
-        phabricator_users:
-            - <replace_me>
-        github_users:
-            - <replace_me>
