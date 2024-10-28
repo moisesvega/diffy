@@ -24,6 +24,6 @@ review processes.
 - **Real-Time Data**: Provides up-to-date information on code review activities.
 - **Historical Data Analysis**: Offers insights based on historical data to track progress over time.
 
-## Installation
+## Status
 
-To install Diffy, run the following command:
+In development
