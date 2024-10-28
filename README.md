@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/moisesvega/diffy/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/moisesvega/diffy/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/moisesvega/diffy/graph/badge.svg?token=FNAXMLNR2D)](https://codecov.io/gh/moisesvega/diffy)
+![Static Badge](https://img.shields.io/badge/status-development-blue)
+
 
 # Diffy
 
