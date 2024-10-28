@@ -2,6 +2,7 @@ package heatmap
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"time"
 
@@ -32,32 +33,43 @@ type reporter struct {
 
 const _timeLayout = "2006-01-02"
 
-func (r *reporter) Report(users []*model.User) error {
+func (r *reporter) Report(users []*model.User, option ...model.ReporterOption) error {
+	opts := &model.ReporterOptions{}
+	// Apply the options
+	for _, o := range option {
+		o(opts)
+	}
 	for _, user := range users {
-		reportUser(user)
+		reportUser(user, opts)
 	}
 	return nil
 }
 
-func reportUser(user *model.User) {
+func reportUser(user *model.User, opts *model.ReporterOptions) {
+	w := opts.Writer
+	if w == nil {
+		w = os.Stdout
+	}
 	heatmap := make(map[string]int)
 	for _, differential := range user.Differentials {
 		heatmap[differential.ModifiedAt.Format(_timeLayout)]++
 	}
 
-	// TODO(moisesvega): Pass an option to set the date range
-	var since *time.Time
-	what := time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.Local)
-	since = &what
-
 	today := time.Now().AddDate(0, 0, -1)
-	yearAgo := today.AddDate(-1, 0, 0)
-	if since != nil {
-		yearAgo = *since
+	// Default since is the beginning of the year
+	since := time.Date(
+		time.Now().Year(),
+		time.January, 1, 0, 0, 0, 0,
+		time.Local).AddDate(-1, 0, 0)
+
+	// If the user provided a "since" date, we'll use that instead
+	if opts.Since != nil {
+		since = *opts.Since
 	}
 
-	for yearAgo.Weekday() != time.Saturday {
-		yearAgo = yearAgo.AddDate(0, 0, +1)
+	// We need to find the first Sunday of the year
+	for since.Weekday() != time.Sunday {
+		since = since.AddDate(0, 0, +1)
 	}
 
 	// 7 days of the week + 1 row for the month
@@ -68,21 +80,21 @@ func reportUser(user *model.User) {
 	}
 
 	// We need to track the current month to add it to the heatmap
-	currentMonth := yearAgo.Month()
+	currentMonth := since.Month()
 	// To make it easier to add the month to the heatmap, we'll add it to the last row
 	headers := make([]string, 0)
 	headers = append(headers, "", currentMonth.String()[0:3])
 	total := 0
-	for !yearAgo.After(today) {
-		yearAgo = yearAgo.AddDate(0, 0, 1)
+	for !since.After(today) {
+		since = since.AddDate(0, 0, 1)
 		count := 0
-		if v, ok := heatmap[yearAgo.Format(_timeLayout)]; ok {
+		if v, ok := heatmap[since.Format(_timeLayout)]; ok {
 			count = v
 		}
 		diffCount := strconv.Itoa(count)
-		rows[yearAgo.Weekday()] = append(rows[yearAgo.Weekday()], diffCount)
-		if yearAgo.Month() != currentMonth {
-			currentMonth = yearAgo.Month()
+		rows[since.Weekday()] = append(rows[since.Weekday()], diffCount)
+		if since.Month() != currentMonth {
+			currentMonth = since.Month()
 			for len(headers)-len(rows[0]) <= 0 {
 				headers = append(headers, "")
 			}
@@ -133,8 +145,7 @@ func reportUser(user *model.User) {
 				Align(lipgloss.Center).BorderBackground(lipgloss.Color("#57606a"))
 		}).
 		Rows(rows...).Width(0).Headers(headers...)
-	fmt.Println(t)
-	fmt.Println("Total Differentials:" + strconv.Itoa(total))
+	_, _ = fmt.Fprint(w, t.Render())
 }
 
 func New() model.Reporter {
