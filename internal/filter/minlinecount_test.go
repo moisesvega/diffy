@@ -9,22 +9,22 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestByStatus(t *testing.T) {
+func TestByLineCount(t *testing.T) {
 
 	tests := []struct {
-		desc   string
-		status model.Status
-		give   []*model.Differential
-		want   []*model.Differential
+		desc  string
+		count int
+		give  []*model.Differential
+		want  []*model.Differential
 	}{
 		{
-			desc:   "success",
-			status: model.Closed,
+			desc:  "success",
+			count: 10,
 			give: []*model.Differential{
 				{
 					ID:         "1",
 					Title:      "title",
-					LineCount:  10,
+					LineCount:  9,
 					Status:     model.Closed,
 					StatusName: "closed",
 					URI:        "uri",
@@ -32,7 +32,7 @@ func TestByStatus(t *testing.T) {
 				{
 					ID:         "2",
 					Title:      "title",
-					LineCount:  10,
+					LineCount:  20,
 					Status:     model.Accepted,
 					StatusName: "accepted",
 					URI:        "uri",
@@ -40,11 +40,11 @@ func TestByStatus(t *testing.T) {
 			},
 			want: []*model.Differential{
 				{
-					ID:         "1",
+					ID:         "2",
 					Title:      "title",
-					LineCount:  10,
-					Status:     model.Closed,
-					StatusName: "closed",
+					LineCount:  20,
+					Status:     model.Accepted,
+					StatusName: "accepted",
 					URI:        "uri",
 				},
 			},
@@ -52,7 +52,7 @@ func TestByStatus(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			got := slices.DeleteFunc(tt.give, ByStatus(tt.status))
+			got := slices.DeleteFunc(tt.give, MinLineCount(tt.count))
 			require.Len(t, got, len(tt.want))
 			assert.EqualValues(t, tt.want, got)
 		})

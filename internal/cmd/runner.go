@@ -56,7 +56,8 @@ func (r *runner) run(args []string) error {
 	// filter out closed differentials and those with less than 10 lines
 	for _, user := range u {
 		diffs := slices.DeleteFunc(user.Differentials, filter.ByStatus(model.Closed))
-		user.Differentials = slices.DeleteFunc(diffs, filter.ByLineCount(10))
+		// TODO(moisesvega): make the line count configurable
+		user.Differentials = slices.DeleteFunc(diffs, filter.MinLineCount(10))
 	}
 	hm := heatmap.New()
 	return hm.Report(u)
