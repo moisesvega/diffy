@@ -1,9 +1,11 @@
 package mapper
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/moisesvega/diffy/internal/model"
+	"github.com/uber/gonduit/constants"
 	"github.com/uber/gonduit/entities"
 	"github.com/uber/gonduit/responses"
 )
@@ -19,15 +21,31 @@ func FromPhabricatorUser(in entities.User) *model.User {
 
 // FromPhabricatorDifferential maps an entities.DifferentialRevision to a model.Differential.
 func FromPhabricatorDifferential(in entities.DifferentialRevision) *model.Differential {
+	count, err := strconv.Atoi(in.LineCount)
+	if err != nil {
+		count = 0
+	}
 	return &model.Differential{
 		ID:         in.ID,
 		Title:      in.Title,
-		LineCount:  in.LineCount,
-		Status:     in.Status,
+		LineCount:  count,
+		Status:     FromPhabricatorStatus(in.Status),
 		StatusName: in.StatusName,
 		URI:        in.URI,
 		CreatedAt:  time.Time(in.DateCreated),
 		ModifiedAt: time.Time(in.DateModified),
+	}
+}
+
+// FromPhabricatorStatus maps a constants.DifferentialStatusLegacy to a model.Status.
+func FromPhabricatorStatus(in constants.DifferentialStatusLegacy) model.Status {
+	switch in {
+	case constants.DifferentialStatusLegacyAccepted:
+		return model.Accepted
+	case constants.DifferentialStatusLegacyPublished:
+		return model.Closed
+	default:
+		return model.Unknown
 	}
 }
 

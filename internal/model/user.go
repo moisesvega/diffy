@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/uber/gonduit/constants"
 )
 
 // User represents a Phabricator User.
@@ -16,13 +14,21 @@ type User struct {
 	Reviews       []*Differential
 }
 
+type Status string
+
+const (
+	Accepted Status = "accepted"
+	Closed   Status = "closed"
+	Unknown  Status = "unknown"
+)
+
 // Differential represents a Phabricator Differential.
 // This is a simplified version of the DifferentialRevision entity from gonduit.
 type Differential struct {
 	ID             string
 	Title          string
-	LineCount      string
-	Status         constants.DifferentialStatusLegacy
+	LineCount      int
+	Status         Status
 	StatusName     string
 	URI            string
 	CreatedAt      time.Time
