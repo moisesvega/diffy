@@ -2,6 +2,7 @@ package heatmap
 
 import (
 	"fmt"
+	"math/rand/v2"
 	"os"
 	"strconv"
 	"time"
@@ -89,7 +90,7 @@ func reportUser(user *model.User, opts *model.ReporterOptions) error {
 	total := 0
 	for !since.After(today) {
 		since = since.AddDate(0, 0, 1)
-		count := 0
+		count := rand.IntN(10)
 		if v, ok := heatmap[since.Format(_timeLayout)]; ok {
 			count = v
 		}
@@ -106,15 +107,15 @@ func reportUser(user *model.User, opts *model.ReporterOptions) error {
 	}
 
 	t := table.New().
-		Border(lipgloss.HiddenBorder()).
+		Border(lipgloss.RoundedBorder()).
 		BorderStyle(lipgloss.NewStyle().Background(lipgloss.Color(_background)).Width(0)).
-		StyleFunc(stylefn(rows)).
+		StyleFunc(styleFn(rows)).
 		Rows(rows...).Width(0).Headers(headers...)
 	_, err := fmt.Fprint(w, t.Render(), "\n")
 	return err
 }
 
-func stylefn(rows [][]string) func(row, col int) lipgloss.Style {
+func styleFn(rows [][]string) func(row, col int) lipgloss.Style {
 	return func(row, col int) lipgloss.Style {
 		rowFromData := row - 1
 		if row > len(rows) || rowFromData < 0 {
@@ -151,7 +152,8 @@ func stylefn(rows [][]string) func(row, col int) lipgloss.Style {
 			Background(lipgloss.Color(color)).
 			Width(3).
 			Foreground(lipgloss.Color(fontColor)).
-			Align(lipgloss.Center).BorderBackground(lipgloss.Color(_borderBackground))
+			Align(lipgloss.Center).
+			BorderBackground(lipgloss.Color(_borderBackground))
 	}
 }
 

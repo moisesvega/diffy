@@ -5,16 +5,16 @@ import (
 )
 
 type opts struct {
-	settings    bool
-	phabUsers   []string
-	githubUsers []string
+	settings  bool
+	phabUsers []string
 }
 
+const _settingsDesc = `Opens the settings file in the editor. By default, uses $XDG_CONFIG_HOME as the path. On macOS, if $XDG_CONFIG_HOME is not set, defaults to $HOME/Library/Application Support/diffy`
+
 func setFlags(fs *pflag.FlagSet, opts *opts) {
-	// TODO: CreateDefaults proper descriptions
-	fs.BoolVar(&opts.settings, "settings", false, "edit settings")
+	fs.BoolVar(&opts.settings, "settings", false, _settingsDesc)
 	fs.StringSliceVar(&opts.phabUsers, "phab_users", nil, "List of phabricator users you want to track.")
-	fs.StringSliceVar(&opts.githubUsers, "github_users", nil, "List of github users you want to track.")
+	// TODO(moisesvega): Add github users flag
 
 	fs.SortFlags = false
 }

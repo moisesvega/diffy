@@ -21,7 +21,6 @@ type runner struct {
 	phabricator phabricator.Client
 	config      config.Operations
 	xdgConfig   func(string) (string, error)
-	cfg         *config.Config
 }
 
 const (
@@ -43,7 +42,13 @@ func (r *runner) run(args []string) error {
 		return r.openAndEditConfigFile(sPath)
 	}
 
-	phab, err := phabricator.New(r.cfg.APIs.Phabricator)
+	// cfg, err := r.config.Read(sPath)
+	// if err != nil {
+	// 	return fmt.Errorf("%w: %w", errConfigNotFound, err)
+	// }
+
+	var cfg config.Config
+	phab, err := phabricator.New(cfg.APIs.Phabricator)
 	if err != nil {
 		return err
 	}
@@ -56,7 +61,6 @@ func (r *runner) run(args []string) error {
 	// filter out closed differentials and those with less than 10 lines
 	for _, user := range u {
 		diffs := slices.DeleteFunc(user.Differentials, filter.ByStatus(model.Closed))
-		// TODO(moisesvega): make the line count configurable
 		user.Differentials = slices.DeleteFunc(diffs, filter.MinLineCount(10))
 	}
 	hm := heatmap.New()

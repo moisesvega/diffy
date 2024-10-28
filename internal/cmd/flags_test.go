@@ -16,13 +16,11 @@ func TestNewFlagSet(t *testing.T) {
 		"--settings",
 		// Users
 		"--phab_users=" + usersString,
-		"--github_users=" + usersString,
 	}
 
 	want := &opts{
-		settings:    true,
-		phabUsers:   users,
-		githubUsers: users,
+		settings:  true,
+		phabUsers: users,
 	}
 
 	got := &opts{}
