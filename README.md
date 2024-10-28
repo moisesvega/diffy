@@ -1,13 +1,15 @@
+
+
+[![CI](https://github.com/moisesvega/diffy/actions/workflows/go.yml/badge.svg)](https://github.com/moisesvega/diffy/actions/workflows/go.yml)
+[![codecov](https://codecov.io/gh/moisesvega/diffy/graph/badge.svg?token=FNAXMLNR2D)](https://codecov.io/gh/moisesvega/diffy)
+
 # Diffy
 
-Diffy is a robust command-line interface (CLI) tool designed to deliver 
-comprehensive statistics and insights from code reviews and differential 
-analysis. Supporting GitHub and Phabricator, Diffy allows developers to 
+Diffy is a small command-line interface (CLI) tool designed to deliver 
+statistics and insights from code reviews and differential analysis.
+Supporting GitHub and Phabricator, Diffy allows developers to 
 effortlessly track review metrics, identify patterns, and enhance their code 
-review processes. This tool provides valuable data to improve code quality, 
-streamline workflows, and gain deeper insights into development practices. 
-Simplify your code review analytics with Diffy and elevate your development 
-efficiency to the next level.
+review processes.
 
 ## Features
 
