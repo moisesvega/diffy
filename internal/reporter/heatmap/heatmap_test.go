@@ -44,7 +44,7 @@ func TestReport(t *testing.T) {
 
 	want := `
 ╭─────────┬───┬───╮
-│         │Oct│   │
+│username │Oct│   │
 ├─────────┼───┼───┤
 │ Sunday  │ 0 │ 7 │
 │ Monday  │ 0 │ 5 │

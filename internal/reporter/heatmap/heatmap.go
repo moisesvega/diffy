@@ -87,7 +87,7 @@ func (r *reporter) reportUser(user *model.User, opts *model.ReporterOptions) err
 	currentMonth := since.Month()
 	// To make it easier to add the month to the heatmap, we'll add it to the last row
 	headers := make([]string, 0)
-	headers = append(headers, "", currentMonth.String()[0:3])
+	headers = append(headers, user.Username, currentMonth.String()[0:3])
 	for !since.After(today) {
 		since = since.AddDate(0, 0, 1)
 		count := 0
