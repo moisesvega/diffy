@@ -3,6 +3,7 @@ package heatmap
 import (
 	"bytes"
 	"testing"
+	"time"
 
 	"github.com/moisesvega/diffy/internal/model"
 	"github.com/stretchr/testify/assert"
@@ -15,34 +16,48 @@ func TestNew(t *testing.T) {
 }
 
 func TestReport(t *testing.T) {
-	tests := []struct {
-		desc string
-		give []*model.User
-		want bool
-	}{
+	today := time.Date(2024, 10, 28, 0, 0, 0, 0, time.UTC)
+	give := []*model.User{
 		{
-			desc: "success",
-			give: []*model.User{
+			Username: "username",
+			Differentials: []*model.Differential{
 				{
-					Username: "moisesvega",
-					Differentials: []*model.Differential{
-						{
-							Title:     "title",
-							URI:       "uri",
-							LineCount: 11,
-						},
-					},
+					Title:      "title",
+					URI:        "uri",
+					LineCount:  11,
+					ModifiedAt: today.AddDate(0, 0, -1), // yesterday
 				},
 			},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.desc, func(t *testing.T) {
-			r := &reporter{}
-			w := &bytes.Buffer{}
-			err := r.Report(tt.give, model.WithWriter(w))
-			require.NoError(t, err)
-			assert.NotEmpty(t, w)
-		})
+
+	want := `╭─────────┬───╮
+│         │Oct│
+├─────────┼───┤
+│ Sunday  │ 1 │
+│ Monday  │ 0 │
+│ Tuesday │   │
+│Wednesday│   │
+│Thursday │   │
+│ Friday  │   │
+│Saturday │   │
+╰─────────┴───╯
+`
+	r := &reporter{
+		now: func() time.Time {
+			return today
+		},
 	}
+	w := &bytes.Buffer{}
+	err := r.Report(give,
+		model.WithWriter(w),
+		model.WithSince(
+			// 7 days ago
+			time.Now().AddDate(0, 0, -7),
+		),
+	)
+	require.NoError(t, err)
+	assert.NotEmpty(t, w)
+	assert.Equal(t, want, w.String())
+
 }

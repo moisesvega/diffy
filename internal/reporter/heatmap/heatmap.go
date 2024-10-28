@@ -2,7 +2,6 @@ package heatmap
 
 import (
 	"fmt"
-	"math/rand/v2"
 	"os"
 	"strconv"
 	"time"
@@ -31,6 +30,7 @@ var style = lipgloss.NewStyle().
 	Background(lipgloss.Color(_background)).Align(lipgloss.Center)
 
 type reporter struct {
+	now func() time.Time
 }
 
 const _timeLayout = "2006-01-02"
@@ -44,14 +44,14 @@ func (r *reporter) Report(users []*model.User, option ...model.ReporterOption) e
 
 	// Report the users
 	for _, user := range users {
-		if err := reportUser(user, opts); err != nil {
+		if err := r.reportUser(user, opts); err != nil {
 			return fmt.Errorf("failed to report user: %w", err)
 		}
 	}
 	return nil
 }
 
-func reportUser(user *model.User, opts *model.ReporterOptions) error {
+func (r *reporter) reportUser(user *model.User, opts *model.ReporterOptions) error {
 	w := opts.Writer
 	if opts.Writer == nil {
 		w = os.Stdout
@@ -62,7 +62,7 @@ func reportUser(user *model.User, opts *model.ReporterOptions) error {
 	}
 
 	// We'll start the heatmap from the previous day
-	today := time.Now().AddDate(0, 0, -1)
+	today := r.now()
 	// By default, we'll start the heatmap from the beginning of the year
 	since := today.AddDate(-1, 0, 0)
 	if opts.Since != nil {
@@ -70,7 +70,7 @@ func reportUser(user *model.User, opts *model.ReporterOptions) error {
 	}
 
 	// We need to find the first Sunday of the year
-	for since.Weekday() != time.Sunday {
+	for since.Weekday() != time.Saturday {
 		since = since.AddDate(0, 0, +1)
 	}
 
@@ -87,10 +87,9 @@ func reportUser(user *model.User, opts *model.ReporterOptions) error {
 	// To make it easier to add the month to the heatmap, we'll add it to the last row
 	headers := make([]string, 0)
 	headers = append(headers, "", currentMonth.String()[0:3])
-	total := 0
 	for !since.After(today) {
 		since = since.AddDate(0, 0, 1)
-		count := rand.IntN(10)
+		count := 0
 		if v, ok := heatmap[since.Format(_timeLayout)]; ok {
 			count = v
 		}
@@ -103,7 +102,6 @@ func reportUser(user *model.User, opts *model.ReporterOptions) error {
 			}
 			headers = append(headers, currentMonth.String()[0:3])
 		}
-		total += count
 	}
 
 	t := table.New().
@@ -158,7 +156,9 @@ func styleFn(rows [][]string) func(row, col int) lipgloss.Style {
 }
 
 func New() model.Reporter {
-	return &reporter{}
+	return &reporter{
+		now: time.Now,
+	}
 }
 
 var _ model.Reporter = &reporter{}
