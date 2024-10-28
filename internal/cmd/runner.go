@@ -16,11 +16,11 @@ import (
 )
 
 type runner struct {
-	opts        opts
-	editor      editor.Open
-	phabricator phabricator.Client
-	config      config.Operations
-	xdgConfig   func(string) (string, error)
+	opts      opts
+	editor    editor.Open
+	phabNew   func(config.Phabricator) (*phabricator.Client, error)
+	config    config.Operations
+	xdgConfig func(string) (string, error)
 }
 
 const (
@@ -42,13 +42,12 @@ func (r *runner) run(args []string) error {
 		return r.openAndEditConfigFile(sPath)
 	}
 
-	// cfg, err := r.config.Read(sPath)
-	// if err != nil {
-	// 	return fmt.Errorf("%w: %w", errConfigNotFound, err)
-	// }
+	cfg, err := r.config.Read(sPath)
+	if err != nil {
+		return fmt.Errorf("%w: %w", errConfigNotFound, err)
+	}
 
-	var cfg config.Config
-	phab, err := phabricator.New(cfg.APIs.Phabricator)
+	phab, err := r.phabNew(cfg.APIs.Phabricator)
 	if err != nil {
 		return err
 	}
