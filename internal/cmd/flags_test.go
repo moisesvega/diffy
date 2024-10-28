@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/spf13/pflag"
@@ -10,17 +9,12 @@ import (
 )
 
 func TestNewFlagSet(t *testing.T) {
-	users := []string{"first", "second"}
-	usersString := strings.Join(users, ",")
 	give := []string{
 		"--settings",
-		// Users
-		"--phab_users=" + usersString,
 	}
 
 	want := &opts{
-		settings:  true,
-		phabUsers: users,
+		settings: true,
 	}
 
 	got := &opts{}
