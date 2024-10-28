@@ -13,15 +13,16 @@ import (
 
 const (
 	// TODO(moisesvega): Make it configurable
-	_zero           = "#11141A"
-	_low            = "#0e4429"
-	_mid            = "#006d32"
-	_high           = "#26a641"
-	_max            = "#39d353"
-	_background     = "#212830"
-	_whiteFontColor = "#FAFAFA"
-	_grayFontColor  = "#D1D1D1"
-	_blackFontColor = "#000000"
+	_zero             = "#11141A"
+	_low              = "#0e4429"
+	_mid              = "#006d32"
+	_high             = "#26a641"
+	_max              = "#39d353"
+	_background       = "#212830"
+	_whiteFontColor   = "#FAFAFA"
+	_grayFontColor    = "#D1D1D1"
+	_blackFontColor   = "#000000"
+	_borderBackground = "#57606a"
 )
 
 var style = lipgloss.NewStyle().
@@ -39,15 +40,19 @@ func (r *reporter) Report(users []*model.User, option ...model.ReporterOption) e
 	for _, o := range option {
 		o(opts)
 	}
+
+	// Report the users
 	for _, user := range users {
-		reportUser(user, opts)
+		if err := reportUser(user, opts); err != nil {
+			return fmt.Errorf("failed to report user: %w", err)
+		}
 	}
 	return nil
 }
 
-func reportUser(user *model.User, opts *model.ReporterOptions) {
+func reportUser(user *model.User, opts *model.ReporterOptions) error {
 	w := opts.Writer
-	if w == nil {
+	if opts.Writer == nil {
 		w = os.Stdout
 	}
 	heatmap := make(map[string]int)
@@ -55,14 +60,10 @@ func reportUser(user *model.User, opts *model.ReporterOptions) {
 		heatmap[differential.ModifiedAt.Format(_timeLayout)]++
 	}
 
+	// We'll start the heatmap from the previous day
 	today := time.Now().AddDate(0, 0, -1)
-	// Default since is the beginning of the year
-	since := time.Date(
-		time.Now().Year(),
-		time.January, 1, 0, 0, 0, 0,
-		time.Local).AddDate(-1, 0, 0)
-
-	// If the user provided a "since" date, we'll use that instead
+	// By default, we'll start the heatmap from the beginning of the year
+	since := today.AddDate(-1, 0, 0)
 	if opts.Since != nil {
 		since = *opts.Since
 	}
@@ -72,9 +73,10 @@ func reportUser(user *model.User, opts *model.ReporterOptions) {
 		since = since.AddDate(0, 0, +1)
 	}
 
-	// 7 days of the week + 1 row for the month
+	// We'll create a heatmap with the days of the week as columns
 	rows := make([][]string, 7)
-	// First column should be the days of the week
+
+	// We'll add the days of the week as the first row
 	for weekday := range 7 {
 		rows[weekday] = append(rows[weekday], time.Weekday(weekday).String())
 	}
@@ -106,46 +108,51 @@ func reportUser(user *model.User, opts *model.ReporterOptions) {
 	t := table.New().
 		Border(lipgloss.HiddenBorder()).
 		BorderStyle(lipgloss.NewStyle().Background(lipgloss.Color(_background)).Width(0)).
-		StyleFunc(func(row, col int) lipgloss.Style {
-			rowFromData := row - 1
-			if row > len(rows) || rowFromData < 0 {
-				return style
-			}
-			if col >= len(rows[rowFromData]) {
-				return style
-			}
-
-			value := rows[rowFromData][col]
-			v, err := strconv.Atoi(value)
-			if err != nil {
-				return style
-			}
-
-			color := _zero
-			fontColor := _whiteFontColor
-			switch {
-			case v >= 1 && v < 3:
-				color = _low
-				fontColor = _grayFontColor
-			case v >= 3 && v < 5:
-				color = _mid
-				fontColor = _grayFontColor
-			case v >= 5 && v < 7:
-				color = _high
-				fontColor = _blackFontColor
-			case v >= 7:
-				color = _max
-				fontColor = _blackFontColor
-			}
-
-			return lipgloss.NewStyle().
-				Background(lipgloss.Color(color)).
-				Width(3).
-				Foreground(lipgloss.Color(fontColor)).
-				Align(lipgloss.Center).BorderBackground(lipgloss.Color("#57606a"))
-		}).
+		StyleFunc(stylefn(rows)).
 		Rows(rows...).Width(0).Headers(headers...)
-	_, _ = fmt.Fprint(w, t.Render())
+	_, err := fmt.Fprint(w, t.Render(), "\n")
+	return err
+}
+
+func stylefn(rows [][]string) func(row, col int) lipgloss.Style {
+	return func(row, col int) lipgloss.Style {
+		rowFromData := row - 1
+		if row > len(rows) || rowFromData < 0 {
+			return style
+		}
+		if col >= len(rows[rowFromData]) {
+			return style
+		}
+
+		value := rows[rowFromData][col]
+		v, err := strconv.Atoi(value)
+		if err != nil {
+			return style
+		}
+
+		color := _zero
+		fontColor := _whiteFontColor
+		switch {
+		case v >= 1 && v < 3:
+			color = _low
+			fontColor = _grayFontColor
+		case v >= 3 && v < 5:
+			color = _mid
+			fontColor = _grayFontColor
+		case v >= 5 && v < 7:
+			color = _high
+			fontColor = _blackFontColor
+		case v >= 7:
+			color = _max
+			fontColor = _blackFontColor
+		}
+
+		return lipgloss.NewStyle().
+			Background(lipgloss.Color(color)).
+			Width(3).
+			Foreground(lipgloss.Color(fontColor)).
+			Align(lipgloss.Center).BorderBackground(lipgloss.Color(_borderBackground))
+	}
 }
 
 func New() model.Reporter {
