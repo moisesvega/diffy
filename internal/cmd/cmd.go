@@ -27,14 +27,12 @@ func Main() *cobra.Command {
 		Example:       "",
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		RunE:          r.runE,
 	}
-	cmd.RunE = runE(&r)
 	cmd.AddCommand(settings.New())
 	return cmd
 }
 
-func runE(r *runner) func(cmd *cobra.Command, args []string) error {
-	return func(cmd *cobra.Command, args []string) error {
-		return r.run(cmd.Flags().Args())
-	}
+func (r *runner) runE(cmd *cobra.Command, args []string) error {
+	return r.run(cmd.Flags().Args())
 }
