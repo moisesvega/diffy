@@ -33,6 +33,9 @@ var (
 
 func (r *runner) run(args []string) error {
 	sPath, err := r.xdgConfig(settingsFilePath)
+	if err != nil {
+		return err
+	}
 	cfg, err := r.config.Read(sPath)
 	if err != nil {
 		return fmt.Errorf("%w: %w", errConfigNotFound, err)
