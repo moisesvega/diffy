@@ -12,7 +12,7 @@ package phabricatormock
 import (
 	"reflect"
 
-	"github.com/moisesvega/diffy/internal/model"
+	"github.com/moisesvega/diffy/internal/entity"
 	"go.uber.org/mock/gomock"
 )
 
@@ -42,10 +42,10 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 }
 
 // GetUsers mocks base method.
-func (m *MockClient) GetUsers(arg0 []string) ([]*model.User, error) {
+func (m *MockClient) GetUsers(arg0 []string) ([]*entity.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUsers", arg0)
-	ret0, _ := ret[0].([]*model.User)
+	ret0, _ := ret[0].([]*entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

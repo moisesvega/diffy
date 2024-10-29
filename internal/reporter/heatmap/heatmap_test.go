@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/moisesvega/diffy/internal/model"
+	"github.com/moisesvega/diffy/internal/entity"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -23,10 +23,10 @@ func TestReport(t *testing.T) {
 
 	collection := []time.Time{wednesday, tuesday, monday, sunday}
 
-	differentials := make([]*model.Differential, 0)
+	differentials := make([]*entity.Differential, 0)
 	for i, day := range collection {
 		for j := 0; j <= i*2; j++ {
-			differentials = append(differentials, &model.Differential{
+			differentials = append(differentials, &entity.Differential{
 				Title:      "title",
 				URI:        "uri",
 				LineCount:  11,
@@ -35,7 +35,7 @@ func TestReport(t *testing.T) {
 		}
 
 	}
-	give := []*model.User{
+	give := []*entity.User{
 		{
 			Username:      "username",
 			Differentials: differentials,
@@ -62,8 +62,8 @@ func TestReport(t *testing.T) {
 	}
 	w := &bytes.Buffer{}
 	err := r.Report(give,
-		model.WithWriter(w),
-		model.WithSince(
+		entity.WithWriter(w),
+		entity.WithSince(
 			// 7 days ago
 			time.Now().AddDate(0, 0, -7),
 		),
@@ -88,10 +88,10 @@ func TestReporterError(t *testing.T) {
 			return today
 		},
 	}
-	give := []*model.User{
+	give := []*entity.User{
 		{
 			Username: "username",
-			Differentials: []*model.Differential{
+			Differentials: []*entity.Differential{
 				{
 					Title:      "title",
 					URI:        "uri",
@@ -103,7 +103,7 @@ func TestReporterError(t *testing.T) {
 	}
 
 	want := errors.New("sad")
-	err := r.Report(give, model.WithWriter(failedWriter{err: want}))
+	err := r.Report(give, entity.WithWriter(failedWriter{err: want}))
 	require.Error(t, err)
 	assert.ErrorIs(t, err, want)
 }

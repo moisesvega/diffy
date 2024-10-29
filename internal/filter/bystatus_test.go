@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/moisesvega/diffy/internal/model"
+	"github.com/moisesvega/diffy/internal/entity"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -13,19 +13,19 @@ func TestByStatus(t *testing.T) {
 
 	tests := []struct {
 		desc   string
-		status model.Status
-		give   []*model.Differential
-		want   []*model.Differential
+		status entity.Status
+		give   []*entity.Differential
+		want   []*entity.Differential
 	}{
 		{
 			desc:   "success",
-			status: model.Closed,
-			give: []*model.Differential{
+			status: entity.Closed,
+			give: []*entity.Differential{
 				{
 					ID:         "1",
 					Title:      "title",
 					LineCount:  10,
-					Status:     model.Closed,
+					Status:     entity.Closed,
 					StatusName: "closed",
 					URI:        "uri",
 				},
@@ -33,17 +33,17 @@ func TestByStatus(t *testing.T) {
 					ID:         "2",
 					Title:      "title",
 					LineCount:  10,
-					Status:     model.Accepted,
+					Status:     entity.Accepted,
 					StatusName: "accepted",
 					URI:        "uri",
 				},
 			},
-			want: []*model.Differential{
+			want: []*entity.Differential{
 				{
 					ID:         "1",
 					Title:      "title",
 					LineCount:  10,
-					Status:     model.Closed,
+					Status:     entity.Closed,
 					StatusName: "closed",
 					URI:        "uri",
 				},

@@ -4,28 +4,28 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/moisesvega/diffy/internal/model"
+	"github.com/moisesvega/diffy/internal/entity"
 	"github.com/uber/gonduit/constants"
 	"github.com/uber/gonduit/entities"
 	"github.com/uber/gonduit/responses"
 )
 
-// FromPhabricatorUser maps an entities.User to a model.User.
-func FromPhabricatorUser(in entities.User) *model.User {
-	return &model.User{
+// FromPhabricatorUser maps an entities.User to a entity.User.
+func FromPhabricatorUser(in entities.User) *entity.User {
+	return &entity.User{
 		Username: in.UserName,
 		Email:    in.Email,
 		ID:       in.PHID,
 	}
 }
 
-// FromPhabricatorDifferential maps an entities.DifferentialRevision to a model.Differential.
-func FromPhabricatorDifferential(in entities.DifferentialRevision) *model.Differential {
+// FromPhabricatorDifferential maps an entities.DifferentialRevision to a entity.Differential.
+func FromPhabricatorDifferential(in entities.DifferentialRevision) *entity.Differential {
 	count, err := strconv.Atoi(in.LineCount)
 	if err != nil {
 		count = 0
 	}
-	return &model.Differential{
+	return &entity.Differential{
 		ID:         in.ID,
 		Title:      in.Title,
 		LineCount:  count,
@@ -37,21 +37,21 @@ func FromPhabricatorDifferential(in entities.DifferentialRevision) *model.Differ
 	}
 }
 
-// FromPhabricatorStatus maps a constants.DifferentialStatusLegacy to a model.Status.
-func FromPhabricatorStatus(in constants.DifferentialStatusLegacy) model.Status {
+// FromPhabricatorStatus maps a constants.DifferentialStatusLegacy to a entity.Status.
+func FromPhabricatorStatus(in constants.DifferentialStatusLegacy) entity.Status {
 	switch in {
 	case constants.DifferentialStatusLegacyAccepted:
-		return model.Accepted
+		return entity.Accepted
 	case constants.DifferentialStatusLegacyPublished:
-		return model.Closed
+		return entity.Closed
 	default:
-		return model.Unknown
+		return entity.Unknown
 	}
 }
 
-// FromPhabricatorDifferentialQueryResponse maps an entities.User to a model.User.
-func FromPhabricatorDifferentialQueryResponse(in responses.DifferentialQueryResponse) []*model.Differential {
-	out := make([]*model.Differential, 0, len(in))
+// FromPhabricatorDifferentialQueryResponse maps an entities.User to a entity.User.
+func FromPhabricatorDifferentialQueryResponse(in responses.DifferentialQueryResponse) []*entity.Differential {
+	out := make([]*entity.Differential, 0, len(in))
 	for _, d := range in {
 		out = append(out, FromPhabricatorDifferential(*d))
 	}

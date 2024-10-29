@@ -1,10 +1,10 @@
 package filter
 
-import "github.com/moisesvega/diffy/internal/model"
+import "github.com/moisesvega/diffy/internal/entity"
 
 // ByStatus returns a slices.DeleteFunc that filters differentials by status.
-func ByStatus(status model.Status) func(differential *model.Differential) bool {
-	return func(differential *model.Differential) bool {
+func ByStatus(status entity.Status) func(differential *entity.Differential) bool {
+	return func(differential *entity.Differential) bool {
 		return differential.Status != status
 	}
 }

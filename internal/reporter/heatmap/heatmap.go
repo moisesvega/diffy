@@ -9,7 +9,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
-	"github.com/moisesvega/diffy/internal/model"
+	"github.com/moisesvega/diffy/internal/entity"
 )
 
 const (
@@ -36,8 +36,8 @@ type reporter struct {
 
 const _timeLayout = "2006-01-02"
 
-func (r *reporter) Report(users []*model.User, option ...model.ReporterOption) error {
-	opts := &model.ReporterOptions{}
+func (r *reporter) Report(users []*entity.User, option ...entity.ReporterOption) error {
+	opts := &entity.ReporterOptions{}
 	// Apply the options
 	for _, o := range option {
 		o(opts)
@@ -52,7 +52,7 @@ func (r *reporter) Report(users []*model.User, option ...model.ReporterOption) e
 	return nil
 }
 
-func (r *reporter) reportUser(user *model.User, opts *model.ReporterOptions) error {
+func (r *reporter) reportUser(user *entity.User, opts *entity.ReporterOptions) error {
 	var w io.Writer
 	w = os.Stdout
 	if opts.Writer != nil {
@@ -156,10 +156,10 @@ func styleFn(rows [][]string) func(row, col int) lipgloss.Style {
 	}
 }
 
-func New() model.Reporter {
+func New() entity.Reporter {
 	return &reporter{
 		now: time.Now,
 	}
 }
 
-var _ model.Reporter = &reporter{}
+var _ entity.Reporter = &reporter{}

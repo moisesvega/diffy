@@ -5,9 +5,10 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/moisesvega/diffy/internal/client/phabricator"
+	"github.com/moisesvega/diffy/internal/cmd/settings"
 	"github.com/moisesvega/diffy/internal/config"
 	"github.com/moisesvega/diffy/internal/editor"
-	"github.com/moisesvega/diffy/internal/model"
+	"github.com/moisesvega/diffy/internal/entity"
 	"github.com/moisesvega/diffy/internal/reporter/heatmap"
 	"github.com/spf13/cobra"
 )
@@ -18,7 +19,7 @@ func Main() *cobra.Command {
 		config:    config.New(),
 		phabNew:   phabricator.New,
 		xdgConfig: xdg.ConfigFile,
-		reporters: []model.Reporter{heatmap.New()},
+		reporters: []entity.Reporter{heatmap.New()},
 	}
 	cmd := &cobra.Command{
 		Use:           "diffy",
@@ -27,15 +28,13 @@ func Main() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	o := &opts{}
-	setFlags(cmd.Flags(), o)
-	cmd.RunE = runE(&r, o)
+	cmd.RunE = runE(&r)
+	cmd.AddCommand(settings.New())
 	return cmd
 }
 
-func runE(r *runner, o *opts) func(cmd *cobra.Command, args []string) error {
+func runE(r *runner) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		r.opts = *o
 		return r.run(cmd.Flags().Args())
 	}
 }

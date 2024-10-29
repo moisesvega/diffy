@@ -3,7 +3,7 @@ package mapper
 import (
 	"testing"
 
-	"github.com/moisesvega/diffy/internal/model"
+	"github.com/moisesvega/diffy/internal/entity"
 	"github.com/stretchr/testify/assert"
 	"github.com/uber/gonduit/constants"
 	"github.com/uber/gonduit/entities"
@@ -18,7 +18,7 @@ func TestFromPhabricatorDifferential(t *testing.T) {
 	tests := []struct {
 		desc string
 		give entities.DifferentialRevision
-		want *model.Differential
+		want *entity.Differential
 	}{
 		{
 			desc: "success",
@@ -30,11 +30,11 @@ func TestFromPhabricatorDifferential(t *testing.T) {
 				StatusName: "accepted",
 				URI:        "uri",
 			},
-			want: &model.Differential{
+			want: &entity.Differential{
 				ID:         "1",
 				Title:      "title",
 				LineCount:  10,
-				Status:     model.Accepted,
+				Status:     entity.Accepted,
 				StatusName: "accepted",
 				URI:        "uri",
 			},
@@ -52,7 +52,7 @@ func TestFromPhabricatorDifferentialQueryResponse(t *testing.T) {
 	tests := []struct {
 		desc string
 		give responses.DifferentialQueryResponse
-		want []*model.Differential
+		want []*entity.Differential
 	}{
 		{
 			desc: "success",
@@ -66,12 +66,12 @@ func TestFromPhabricatorDifferentialQueryResponse(t *testing.T) {
 					URI:        "uri",
 				},
 			},
-			want: []*model.Differential{
+			want: []*entity.Differential{
 				{
 					ID:         "1",
 					Title:      "title",
 					LineCount:  10,
-					Status:     model.Accepted,
+					Status:     entity.Accepted,
 					StatusName: "accepted",
 					URI:        "uri",
 				},
@@ -90,22 +90,22 @@ func TestFromPhabricatorStatus(t *testing.T) {
 	tests := []struct {
 		desc string
 		give constants.DifferentialStatusLegacy
-		want model.Status
+		want entity.Status
 	}{
 		{
 			desc: "accepted",
 			give: constants.DifferentialStatusLegacyAccepted,
-			want: model.Accepted,
+			want: entity.Accepted,
 		},
 		{
 			desc: "closed",
 			give: constants.DifferentialStatusLegacyPublished,
-			want: model.Closed,
+			want: entity.Closed,
 		},
 		{
 			desc: "unknown",
 			give: constants.DifferentialStatusLegacyNeedsReview,
-			want: model.Unknown,
+			want: entity.Unknown,
 		},
 	}
 	for _, tt := range tests {
@@ -120,7 +120,7 @@ func TestFromPhabricatorUser(t *testing.T) {
 	tests := []struct {
 		desc string
 		give entities.User
-		want *model.User
+		want *entity.User
 	}{
 		{
 			desc: "success",
@@ -129,7 +129,7 @@ func TestFromPhabricatorUser(t *testing.T) {
 				Email:    "email",
 				PHID:     "1",
 			},
-			want: &model.User{
+			want: &entity.User{
 				Username: "username",
 				Email:    "email",
 				ID:       "1",

@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/moisesvega/diffy/internal/model"
+	"github.com/moisesvega/diffy/internal/entity"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -14,18 +14,18 @@ func TestByLineCount(t *testing.T) {
 	tests := []struct {
 		desc  string
 		count int
-		give  []*model.Differential
-		want  []*model.Differential
+		give  []*entity.Differential
+		want  []*entity.Differential
 	}{
 		{
 			desc:  "success",
 			count: 10,
-			give: []*model.Differential{
+			give: []*entity.Differential{
 				{
 					ID:         "1",
 					Title:      "title",
 					LineCount:  9,
-					Status:     model.Closed,
+					Status:     entity.Closed,
 					StatusName: "closed",
 					URI:        "uri",
 				},
@@ -33,17 +33,17 @@ func TestByLineCount(t *testing.T) {
 					ID:         "2",
 					Title:      "title",
 					LineCount:  20,
-					Status:     model.Accepted,
+					Status:     entity.Accepted,
 					StatusName: "accepted",
 					URI:        "uri",
 				},
 			},
-			want: []*model.Differential{
+			want: []*entity.Differential{
 				{
 					ID:         "2",
 					Title:      "title",
 					LineCount:  20,
-					Status:     model.Accepted,
+					Status:     entity.Accepted,
 					StatusName: "accepted",
 					URI:        "uri",
 				},

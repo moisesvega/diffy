@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/moisesvega/diffy/internal/config"
+	"github.com/moisesvega/diffy/internal/entity"
 	"github.com/moisesvega/diffy/internal/mapper"
-	"github.com/moisesvega/diffy/internal/model"
 	"github.com/uber/gonduit"
 	"github.com/uber/gonduit/core"
 	"github.com/uber/gonduit/requests"
@@ -15,7 +15,7 @@ import (
 )
 
 type Client interface {
-	GetUsers(names []string) ([]*model.User, error)
+	GetUsers(names []string) ([]*entity.User, error)
 }
 
 type client struct {
@@ -60,7 +60,7 @@ func createConnection(cfg config.Phabricator) (*gonduit.Conn, error) {
 }
 
 // GetUsers returns a list of users with their differentials and reviews.
-func (c *client) GetUsers(names []string) ([]*model.User, error) {
+func (c *client) GetUsers(names []string) ([]*entity.User, error) {
 	// We can't query for differentials and reviews by username.
 	// We need to query for users first and then query for differentials and reviews by user PHID.
 	// This is a limitation of the Phabricator API.
@@ -72,7 +72,7 @@ func (c *client) GetUsers(names []string) ([]*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	users := make([]*model.User, 0, len(*res))
+	users := make([]*entity.User, 0, len(*res))
 	for _, user := range *res {
 		u := mapper.FromPhabricatorUser(user)
 		// Then we query for differentials and reviews by user PHID.
@@ -88,7 +88,7 @@ func (c *client) GetUsers(names []string) ([]*model.User, error) {
 	return users, nil
 }
 
-func (c *client) getDifferentials(id string) ([]*model.Differential, error) {
+func (c *client) getDifferentials(id string) ([]*entity.Differential, error) {
 	res, err := c.conn.DifferentialQuery(requests.DifferentialQueryRequest{
 		Authors: []string{id},
 	})
@@ -98,7 +98,7 @@ func (c *client) getDifferentials(id string) ([]*model.Differential, error) {
 	return mapper.FromPhabricatorDifferentialQueryResponse(*res), nil
 }
 
-func (c *client) getReviews(id string) ([]*model.Differential, error) {
+func (c *client) getReviews(id string) ([]*entity.Differential, error) {
 	res, err := c.conn.DifferentialQuery(requests.DifferentialQueryRequest{
 		Reviewers: []string{id},
 	})

@@ -2,17 +2,14 @@ package cmd
 
 import (
 	"errors"
-	"path/filepath"
 	"testing"
 
 	"github.com/moisesvega/diffy/internal/client/phabricator"
 	"github.com/moisesvega/diffy/internal/client/phabricator/phabricatormock"
 	"github.com/moisesvega/diffy/internal/config"
 	"github.com/moisesvega/diffy/internal/config/configmock"
-	"github.com/moisesvega/diffy/internal/editor/editormock"
-	"github.com/moisesvega/diffy/internal/model"
-	"github.com/moisesvega/diffy/internal/model/reportermock"
-	"github.com/stretchr/testify/assert"
+	"github.com/moisesvega/diffy/internal/entity"
+	"github.com/moisesvega/diffy/internal/entity/reportermock"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -20,10 +17,10 @@ import (
 func TestRunner(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		cfg := &config.Config{}
-		u := []*model.User{
+		u := []*entity.User{
 			{
 				Username: "moisesvega",
-				Differentials: []*model.Differential{
+				Differentials: []*entity.Differential{
 					{
 						Title:     "title",
 						URI:       "uri",
@@ -47,23 +44,12 @@ func TestRunner(t *testing.T) {
 			phabNew: func(phabricator config.Phabricator) (phabricator.Client, error) {
 				return phabmock, nil
 			},
-			reporters: []model.Reporter{rmock},
+			reporters: []entity.Reporter{rmock},
 		}
 
 		err := r.run([]string{})
 		require.NoError(t, err)
 		require.NotNil(t, r)
-	})
-	t.Run("xdgConfig error", func(t *testing.T) {
-		want := errors.New("sad")
-		r := &runner{
-			xdgConfig: func(s string) (string, error) {
-				return "", want
-			},
-		}
-		err := r.run([]string{})
-		require.Error(t, err)
-		assert.ErrorIs(t, err, want)
 	})
 
 	t.Run("config fail", func(t *testing.T) {
@@ -111,7 +97,7 @@ func TestRunner(t *testing.T) {
 		cmock.EXPECT().Read("").Return(cfg, nil).Times(1)
 
 		phabmock := phabricatormock.NewMockClient(gomock.NewController(t))
-		phabmock.EXPECT().GetUsers([]string{}).Return([]*model.User{}, want).Times(1)
+		phabmock.EXPECT().GetUsers([]string{}).Return([]*entity.User{}, want).Times(1)
 
 		r := &runner{
 			xdgConfig: func(s string) (string, error) {
@@ -135,9 +121,9 @@ func TestRunner(t *testing.T) {
 		cmock.EXPECT().Read("").Return(cfg, nil).Times(1)
 
 		phabmock := phabricatormock.NewMockClient(gomock.NewController(t))
-		phabmock.EXPECT().GetUsers([]string{}).Return([]*model.User{}, nil).Times(1)
+		phabmock.EXPECT().GetUsers([]string{}).Return([]*entity.User{}, nil).Times(1)
 		rmock := reportermock.NewMockReporter(gomock.NewController(t))
-		rmock.EXPECT().Report([]*model.User{}).Return(want).Times(1)
+		rmock.EXPECT().Report([]*entity.User{}).Return(want).Times(1)
 
 		r := &runner{
 			xdgConfig: func(s string) (string, error) {
@@ -147,64 +133,11 @@ func TestRunner(t *testing.T) {
 			phabNew: func(phabricator config.Phabricator) (phabricator.Client, error) {
 				return phabmock, nil
 			},
-			reporters: []model.Reporter{rmock},
+			reporters: []entity.Reporter{rmock},
 		}
 
 		got := r.run([]string{})
 		require.Error(t, got)
 		require.ErrorIs(t, got, want)
-	})
-}
-
-func TestOpenSettings(t *testing.T) {
-	tmpDir := t.TempDir()
-
-	pathToSettings := filepath.Join(tmpDir, settingsFilePath)
-
-	emock := editormock.NewMockOpen(gomock.NewController(t))
-	emock.EXPECT().OpenFile(pathToSettings).Return(nil).Times(1)
-
-	cfgmock := configmock.NewMockOperations(gomock.NewController(t))
-	cfgmock.EXPECT().CreateDefaults(pathToSettings).Return(nil).Times(1)
-	r := &runner{
-		opts: opts{
-			settings: true,
-		},
-		editor: emock,
-		config: cfgmock,
-		xdgConfig: func(s string) (string, error) {
-			return pathToSettings, nil
-		},
-	}
-
-	err := r.run([]string{})
-	require.NoError(t, err)
-	require.NotNil(t, r)
-}
-
-func TestOpenSettingsError(t *testing.T) {
-	t.Run("success", func(t *testing.T) {
-		tmpDir := t.TempDir()
-
-		pathToSettings := filepath.Join(tmpDir, settingsFilePath)
-		emock := editormock.NewMockOpen(gomock.NewController(t))
-
-		want := errors.New("sad")
-		cfgmock := configmock.NewMockOperations(gomock.NewController(t))
-		cfgmock.EXPECT().CreateDefaults(pathToSettings).Return(want).Times(1)
-		r := &runner{
-			opts: opts{
-				settings: true,
-			},
-			editor: emock,
-			config: cfgmock,
-			xdgConfig: func(s string) (string, error) {
-				return pathToSettings, nil
-			},
-		}
-
-		err := r.run([]string{})
-		require.Error(t, err)
-		assert.ErrorIs(t, err, want)
 	})
 }
