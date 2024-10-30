@@ -30,7 +30,10 @@ var (
 // New creates a new Phabricator client
 func New(cfg config.Phabricator) (Client, error) {
 	conn, err := createConnection(cfg)
-	return &client{conn: conn}, err
+	if err != nil {
+		return nil, err
+	}
+	return &client{conn: conn}, nil
 }
 
 func createConnection(cfg config.Phabricator) (*gonduit.Conn, error) {

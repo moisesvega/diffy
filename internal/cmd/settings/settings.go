@@ -27,7 +27,7 @@ func New() *cobra.Command {
 		editor:    editor.New(os.Stdin, os.Stdout, os.Stderr),
 		config:    config.New(),
 	}
-	cmd := &cobra.Command{
+	return &cobra.Command{
 		Use:           "settings",
 		Short:         "Opens the settings file in the editor. By default, uses $XDG_CONFIG_HOME as the path. On macOS, if $XDG_CONFIG_HOME is not set, defaults to $HOME/Library/Application Support/diffy",
 		Example:       "",
@@ -35,7 +35,6 @@ func New() *cobra.Command {
 		SilenceErrors: true,
 		RunE:          r.runE,
 	}
-	return cmd
 }
 
 type runner struct {

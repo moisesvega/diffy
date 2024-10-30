@@ -26,7 +26,7 @@ func TestNew(t *testing.T) {
 	t.Run("errors", func(t *testing.T) {
 		c, err := New(config.Phabricator{})
 		require.Error(t, err)
-		require.NotNil(t, c)
+		require.Nil(t, c)
 	})
 }
 

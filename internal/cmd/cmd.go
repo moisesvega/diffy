@@ -1,25 +1,25 @@
 package cmd
 
 import (
-	"os"
-
-	"github.com/adrg/xdg"
 	"github.com/moisesvega/diffy/internal/client/phabricator"
+	"github.com/moisesvega/diffy/internal/cmd/contributions"
 	"github.com/moisesvega/diffy/internal/cmd/settings"
 	"github.com/moisesvega/diffy/internal/config"
-	"github.com/moisesvega/diffy/internal/editor"
-	"github.com/moisesvega/diffy/internal/entity"
-	"github.com/moisesvega/diffy/internal/reporter/heatmap"
 	"github.com/spf13/cobra"
 )
 
-func Main() *cobra.Command {
+type Params struct {
+	Config        config.Operations
+	XDGConfigFile func(string) (string, error)
+}
+
+var phabNew = phabricator.New
+
+func New(p Params) (*cobra.Command, error) {
 	r := runner{
-		editor:    editor.New(os.Stdin, os.Stdout, os.Stderr),
-		config:    config.New(),
-		phabNew:   phabricator.New,
-		xdgConfig: xdg.ConfigFile,
-		reporters: []entity.Reporter{heatmap.New()},
+		config:    p.Config,
+		phabNew:   phabNew,
+		xdgConfig: p.XDGConfigFile,
 	}
 	cmd := &cobra.Command{
 		Use:           "diffy",
@@ -29,10 +29,9 @@ func Main() *cobra.Command {
 		SilenceErrors: true,
 		RunE:          r.runE,
 	}
-	cmd.AddCommand(settings.New())
-	return cmd
-}
 
-func (r *runner) runE(cmd *cobra.Command, args []string) error {
-	return r.run(cmd.Flags().Args())
+	cmd.AddCommand(settings.New())
+	c, _ := r.getPhabricatorClient()
+	cmd.AddCommand(contributions.New(c))
+	return cmd, nil
 }

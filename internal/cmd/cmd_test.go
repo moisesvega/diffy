@@ -1,34 +1,40 @@
 package cmd
 
 import (
-	"errors"
 	"testing"
 
-	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
+	"github.com/moisesvega/diffy/internal/client/phabricator"
+	"github.com/moisesvega/diffy/internal/client/phabricator/phabricatormock"
+	"github.com/moisesvega/diffy/internal/config"
+	"github.com/moisesvega/diffy/internal/config/configmock"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
-func TestNewCMD(t *testing.T) {
-	cmd := Main()
+func TestNew(t *testing.T) {
+	oldPhabNew := phabNew
+	t.Cleanup(func() {
+		phabNew = oldPhabNew
+	})
+	phabmock := phabricatormock.NewMockClient(gomock.NewController(t))
+	phabNew = func(phabricator config.Phabricator) (phabricator.Client, error) {
+		return phabmock, nil
+	}
+	path := "diffy/settings.yaml"
+	cfg := configmock.NewMockOperations(gomock.NewController(t))
+	cfg.EXPECT().Read(path).Return(&config.Config{}, nil).Times(1)
+
+	cmd, err := New(Params{
+		Config: cfg,
+		XDGConfigFile: func(s string) (string, error) {
+			return path, nil
+		},
+	})
+	require.NoError(t, err)
 	cmd.SetArgs([]string{"--help"})
 	require.NotNil(t, cmd)
 	require.NotPanics(t, func() {
 		err := cmd.Execute()
 		require.NoError(t, err)
-	})
-}
-
-func TestRunE(t *testing.T) {
-	want := errors.New("sad")
-	r := &runner{
-		xdgConfig: func(s string) (string, error) {
-			return "", want
-		},
-	}
-	require.NotPanics(t, func() {
-		err := r.runE(&cobra.Command{}, []string{})
-		require.Error(t, err)
-		assert.ErrorIs(t, err, want)
 	})
 }
