@@ -16,6 +16,18 @@ func TestNew(t *testing.T) {
 }
 
 func TestReport(t *testing.T) {
+	// Given a user with differentials spread across 4 days:
+	// - Wednesday (today): 7 differentials (3*2 + 1)
+	// - Tuesday: 5 differentials (2*2 + 1)
+	// - Monday: 3 differentials (1*2 + 1)
+	// - Sunday: 1 differential (0*2 + 1)
+	// And we're viewing the heatmap on Wednesday (today)
+	// When we generate the heatmap
+	// Then we should see:
+	// - A table starting from Sunday
+	// - Activity counts matching the differentials per day
+	// - Proper month headers
+	// - Empty cells for days without activity (Thursday, Friday, Saturday)
 	wednesday := time.Date(2024, 10, 30, 0, 0, 0, 0, time.UTC)
 	tuesday := wednesday.AddDate(0, 0, -1)
 	monday := wednesday.AddDate(0, 0, -2)
@@ -50,7 +62,7 @@ func TestReport(t *testing.T) {
 │ Monday  │ 0 │ 5 │
 │ Tuesday │ 0 │ 3 │
 │Wednesday│ 0 │ 1 │
-│Thursday │ 0 │ 0 │
+│Thursday │ 0 │   │
 │ Friday  │ 0 │   │
 │Saturday │ 0 │   │
 ╰─────────┴───┴───╯

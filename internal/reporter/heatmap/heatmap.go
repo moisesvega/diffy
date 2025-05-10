@@ -72,10 +72,11 @@ func (r *reporter) reportUser(user *entity.User, opts *entity.ReporterOptions) e
 	if opts.Since != nil {
 		since = *opts.Since
 	}
-	// We need to find the last Saturday before our start date
+
+	// We need to find the last Sunday before our start date
 	// This ensures we have all differentials from the previous week
 	// before starting with Sunday
-	for since.Weekday() != time.Saturday {
+	for since.Weekday() != time.Sunday {
 		since = since.AddDate(0, 0, -1)
 	}
 
@@ -94,22 +95,24 @@ func (r *reporter) reportUser(user *entity.User, opts *entity.ReporterOptions) e
 	headers = append(headers, user.Username, currentMonth.String()[0:3])
 
 	// Process each day until we reach today
-	for !since.After(today) {
-		since = since.AddDate(0, 0, 1)
+	currentDate := since
+	for !currentDate.After(today) { // Loop until we reach today
 		count := 0
-		if v, ok := heatmap[since.Format(_timeLayout)]; ok {
+		if v, ok := heatmap[currentDate.Format(_timeLayout)]; ok {
 			count = v
 		}
 		diffCount := strconv.Itoa(count)
-		rows[since.Weekday()] = append(rows[since.Weekday()], diffCount)
-		if since.Month() != currentMonth {
-			currentMonth = since.Month()
+		rows[currentDate.Weekday()] = append(rows[currentDate.Weekday()], diffCount)
+
+		if currentDate.Month() != currentMonth {
+			currentMonth = currentDate.Month()
 			// Ensure we have enough headers for the current data
 			for len(headers)-len(rows[0]) <= 0 {
 				headers = append(headers, "")
 			}
 			headers = append(headers, currentMonth.String()[0:3])
 		}
+		currentDate = currentDate.AddDate(0, 0, 1) // Move to next day
 	}
 
 	t := table.New().
