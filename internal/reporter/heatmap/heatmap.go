@@ -30,8 +30,10 @@ var style = lipgloss.NewStyle().
 	Foreground(lipgloss.Color(_whiteFontColor)).
 	Background(lipgloss.Color(_background)).Align(lipgloss.Center)
 
-type reporter struct {
-	now func() time.Time
+type reporter struct{}
+
+var now = func() time.Time {
+	return time.Now()
 }
 
 const _timeLayout = "2006-01-02"
@@ -64,13 +66,15 @@ func (r *reporter) reportUser(user *entity.User, opts *entity.ReporterOptions) e
 	}
 
 	// We'll start the heatmap from the previous day
-	today := r.now()
+	today := now()
 	// By default, we'll start the heatmap from the beginning of the year
 	since := today.AddDate(-1, 0, 0)
 	if opts.Since != nil {
 		since = *opts.Since
 	}
-	// We need to find the first Sunday of the year
+	// We need to find the last Saturday before our start date
+	// This ensures we have all differentials from the previous week
+	// before starting with Sunday
 	for since.Weekday() != time.Saturday {
 		since = since.AddDate(0, 0, -1)
 	}
@@ -88,6 +92,8 @@ func (r *reporter) reportUser(user *entity.User, opts *entity.ReporterOptions) e
 	// To make it easier to add the month to the heatmap, we'll add it to the last row
 	headers := make([]string, 0)
 	headers = append(headers, user.Username, currentMonth.String()[0:3])
+
+	// Process each day until we reach today
 	for !since.After(today) {
 		since = since.AddDate(0, 0, 1)
 		count := 0
@@ -98,6 +104,7 @@ func (r *reporter) reportUser(user *entity.User, opts *entity.ReporterOptions) e
 		rows[since.Weekday()] = append(rows[since.Weekday()], diffCount)
 		if since.Month() != currentMonth {
 			currentMonth = since.Month()
+			// Ensure we have enough headers for the current data
 			for len(headers)-len(rows[0]) <= 0 {
 				headers = append(headers, "")
 			}
@@ -157,9 +164,7 @@ func styleFn(rows [][]string) func(row, col int) lipgloss.Style {
 }
 
 func New() entity.Reporter {
-	return &reporter{
-		now: time.Now,
-	}
+	return &reporter{}
 }
 
 var _ entity.Reporter = &reporter{}

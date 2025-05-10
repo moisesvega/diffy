@@ -50,22 +50,25 @@ func TestReport(t *testing.T) {
 │ Monday  │ 0 │ 5 │
 │ Tuesday │ 0 │ 3 │
 │Wednesday│ 0 │ 1 │
-│Thursday │ 0 │   │
+│Thursday │ 0 │ 0 │
 │ Friday  │ 0 │   │
 │Saturday │ 0 │   │
 ╰─────────┴───┴───╯
 `
-	r := &reporter{
-		now: func() time.Time {
-			return wednesday
-		},
+	originalNow := now
+	t.Cleanup(func() {
+		now = originalNow
+	})
+	now = func() time.Time {
+		return wednesday
 	}
+	r := &reporter{}
 	w := &bytes.Buffer{}
 	err := r.Report(give,
 		entity.WithWriter(w),
 		entity.WithSince(
 			// 7 days ago
-			time.Now().AddDate(0, 0, -7),
+			wednesday.AddDate(0, 0, -7),
 		),
 	)
 	require.NoError(t, err)
@@ -83,11 +86,14 @@ func (f failedWriter) Write(p []byte) (n int, err error) {
 
 func TestReporterError(t *testing.T) {
 	today := time.Date(2024, 10, 28, 0, 0, 0, 0, time.UTC)
-	r := &reporter{
-		now: func() time.Time {
-			return today
-		},
+	originalNow := now
+	t.Cleanup(func() {
+		now = originalNow
+	})
+	now = func() time.Time {
+		return today
 	}
+	r := &reporter{}
 	give := []*entity.User{
 		{
 			Username: "username",
