@@ -62,6 +62,7 @@ jobs:
         branch: "release/${{ inputs.version }}"
         labels: "prepare-release"
         commit-message: "Prepare release ${{ inputs.version }}"
+        token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
         body: |
           ## Release ${{ inputs.version }}
           

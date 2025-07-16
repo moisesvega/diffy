@@ -1,0 +1,73 @@
+name: Prepare release (Simple)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release (e.g. v1.0.0)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    name: Prepare release
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+    - name: Validate version format
+      run: |
+        if [[ ! "${{ inputs.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "Version must be in format v1.2.3"
+          exit 1
+        fi
+
+    - name: Run tests
+      run: make test
+
+    - name: Create changelog entry
+      run: |
+        mkdir -p .changes
+        cat > .changes/${{ inputs.version }}.md << 'EOF'
+        # Release ${{ inputs.version }}
+
+        ## Changes
+
+        - Bug fixes and improvements
+        - Add your changes here
+
+        ## Contributors
+
+        - @${{ github.actor }}
+        EOF
+
+    - name: Commit changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .changes/${{ inputs.version }}.md
+        git commit -m "Prepare release ${{ inputs.version }}"
+        git push
+
+    - name: Create release summary
+      run: |
+        echo "## ✅ Release ${{ inputs.version }} Prepared" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+        echo "1. Review the changelog at \`.changes/${{ inputs.version }}.md\`" >> $GITHUB_STEP_SUMMARY
+        echo "2. Run the 'Publish release' workflow with version ${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Changelog:" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        cat .changes/${{ inputs.version }}.md >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
