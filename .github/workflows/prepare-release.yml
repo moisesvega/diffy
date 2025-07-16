@@ -1,4 +1,4 @@
-name: Prepare release
+name: Prepare release (with PR)
 
 on:
   workflow_dispatch:
@@ -44,16 +44,13 @@ jobs:
 
         ## Changes
 
+        - Bug fixes and improvements
         - Add your changes here
 
         ## Contributors
 
         - @${{ github.actor }}
         EOF
-
-    - name: Update version references
-      run: |
-        echo "Updated for release ${{ inputs.version }}"
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v7
@@ -62,6 +59,7 @@ jobs:
         branch: "release/${{ inputs.version }}"
         labels: "prepare-release"
         commit-message: "Prepare release ${{ inputs.version }}"
+        # Try PAT first, fallback to GITHUB_TOKEN
         token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
         body: |
           ## Release ${{ inputs.version }}
@@ -69,7 +67,7 @@ jobs:
           This PR prepares the release for ${{ inputs.version }}.
           
           ### Checklist
-          - [ ] Update changelog
+          - [ ] Update changelog in `.changes/${{ inputs.version }}.md`
           - [ ] Verify version number
           - [ ] Run tests locally
           - [ ] Review changes
