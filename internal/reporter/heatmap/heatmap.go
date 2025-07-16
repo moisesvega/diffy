@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
@@ -38,6 +39,23 @@ var now = func() time.Time {
 
 const _timeLayout = "2006-01-02"
 
+// formatNumber formats an integer with commas for thousands separators
+func formatNumber(n int) string {
+	str := strconv.Itoa(n)
+	if len(str) <= 3 {
+		return str
+	}
+
+	var result strings.Builder
+	for i, digit := range str {
+		if i > 0 && (len(str)-i)%3 == 0 {
+			result.WriteRune(',')
+		}
+		result.WriteRune(digit)
+	}
+	return result.String()
+}
+
 func (r *reporter) Report(users []*entity.User, option ...entity.ReporterOption) error {
 	opts := &entity.ReporterOptions{}
 	// Apply the options
@@ -60,9 +78,14 @@ func (r *reporter) reportUser(user *entity.User, opts *entity.ReporterOptions) e
 	if opts.Writer != nil {
 		w = opts.Writer
 	}
+
+	// Calculate totals for the user
+	totalDifferentials := len(user.Differentials)
+	totalLinesChanged := 0
 	heatmap := make(map[string]int)
 	for _, differential := range user.Differentials {
 		heatmap[differential.ModifiedAt.Format(_timeLayout)]++
+		totalLinesChanged += differential.LineCount
 	}
 
 	// We'll start the heatmap from the previous day
@@ -120,7 +143,18 @@ func (r *reporter) reportUser(user *entity.User, opts *entity.ReporterOptions) e
 		BorderStyle(lipgloss.NewStyle().Background(lipgloss.Color(_background)).Width(0)).
 		StyleFunc(styleFn(rows)).
 		Rows(rows...).Width(0).Headers(headers...)
-	_, err := fmt.Fprint(w, "\n", t.Render(), "\n")
+
+	// Create totals summary
+	totalsStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(_whiteFontColor)).
+		Background(lipgloss.Color(_background)).
+		Padding(0, 1).
+		Bold(true)
+
+	totalsText := fmt.Sprintf("Total Differentials: %s | Total Lines Changed: %s",
+		formatNumber(totalDifferentials), formatNumber(totalLinesChanged))
+
+	_, err := fmt.Fprint(w, "\n", t.Render(), "\n", totalsStyle.Render(totalsText), "\n")
 	return err
 }
 
