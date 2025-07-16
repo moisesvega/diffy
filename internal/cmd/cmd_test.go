@@ -9,7 +9,7 @@ import (
 )
 
 func TestNewCMD(t *testing.T) {
-	kong := Main()
+	kong := Main("dev")
 	require.NotNil(t, kong)
 }
 

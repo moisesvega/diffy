@@ -11,7 +11,7 @@ func TestNewCMD(t *testing.T) {
 	// Test that the command structure initializes correctly
 	require.NotPanics(t, func() {
 		// This tests that cmd.Main() doesn't panic during construction
-		kong := cmd.Main()
+		kong := cmd.Main(version)
 		require.NotNil(t, kong)
 	})
 }
