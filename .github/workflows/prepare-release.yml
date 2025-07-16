@@ -1,0 +1,77 @@
+name: Prepare release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release (e.g. v1.0.0)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    name: Prepare release
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+    - name: Validate version format
+      run: |
+        if [[ ! "${{ inputs.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "Version must be in format v1.2.3"
+          exit 1
+        fi
+
+    - name: Run tests
+      run: make test
+
+    - name: Create changelog entry
+      run: |
+        mkdir -p .changes
+        cat > .changes/${{ inputs.version }}.md << 'EOF'
+        # Release ${{ inputs.version }}
+
+        ## Changes
+
+        - Add your changes here
+
+        ## Contributors
+
+        - @${{ github.actor }}
+        EOF
+
+    - name: Update version references
+      run: |
+        echo "Updated for release ${{ inputs.version }}"
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v7
+      with:
+        title: "Release ${{ inputs.version }}"
+        branch: "release/${{ inputs.version }}"
+        labels: "prepare-release"
+        commit-message: "Prepare release ${{ inputs.version }}"
+        body: |
+          ## Release ${{ inputs.version }}
+          
+          This PR prepares the release for ${{ inputs.version }}.
+          
+          ### Checklist
+          - [ ] Update changelog
+          - [ ] Verify version number
+          - [ ] Run tests locally
+          - [ ] Review changes
+          
+          After merging this PR, trigger the "Publish release" workflow.
+        delete-branch: true

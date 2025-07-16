@@ -1,9 +1,17 @@
-name: Release
+name: Publish release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release (e.g. v1.0.0)
+        required: true
+        type: string
+      ref:
+        description: Git ref to release from (usually main)
+        required: true
+        default: main
+        type: string
 
 permissions:
   contents: write
@@ -15,6 +23,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.ref }}
           fetch-depth: 0
 
       - name: Set up Go
@@ -22,14 +31,37 @@ jobs:
         with:
           go-version: '1.22'
 
+      - name: Validate version format
+        run: |
+          if [[ ! "${{ inputs.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version must be in format v1.2.3"
+            exit 1
+          fi
+
       - name: Run tests
         run: make test
+
+      - name: Extract changelog
+        run: |
+          if [ -f ".changes/${{ inputs.version }}.md" ]; then
+            tail -n+3 .changes/${{ inputs.version }}.md > release-notes.txt
+          else
+            echo "Release ${{ inputs.version }}" > release-notes.txt
+            echo "" >> release-notes.txt
+            echo "## Changes" >> release-notes.txt
+            echo "- Bug fixes and improvements" >> release-notes.txt
+          fi
+
+      - name: Create and push tag
+        run: |
+          git tag "${{ inputs.version }}"
+          git push origin "${{ inputs.version }}"
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
           distribution: goreleaser
           version: latest
-          args: release --clean
+          args: release --clean --release-notes release-notes.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
