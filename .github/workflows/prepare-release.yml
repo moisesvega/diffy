@@ -20,6 +20,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
 
     - name: Set up Go
       uses: actions/setup-go@v5
@@ -59,8 +62,9 @@ jobs:
         branch: "release/${{ inputs.version }}"
         labels: "prepare-release"
         commit-message: "Prepare release ${{ inputs.version }}"
-        # Try PAT first, fallback to GITHUB_TOKEN
         token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+        add-paths: |
+          .changes/${{ inputs.version }}.md
         body: |
           ## Release ${{ inputs.version }}
           
@@ -74,3 +78,13 @@ jobs:
           
           After merging this PR, trigger the "Publish release" workflow.
         delete-branch: true
+      id: create-pr
+
+    - name: Check PR result
+      run: |
+        if [[ "${{ steps.create-pr.outputs.pull-request-number }}" ]]; then
+          echo "✅ Pull request created successfully: #${{ steps.create-pr.outputs.pull-request-number }}"
+          echo "🔗 PR URL: ${{ steps.create-pr.outputs.pull-request-url }}"
+        else
+          echo "ℹ️ No changes detected or PR already exists"
+        fi
