@@ -14,6 +14,7 @@ import (
 )
 
 type CLI struct {
+	Version  VersionCmd  `cmd:"version" help:"Show version information."`
 	Analyze  AnalyzeCmd  `cmd:"analyze" help:"Analyze users and generate reports."`
 	Settings SettingsCmd `cmd:"settings" help:"Opens the settings file in the editor."`
 }
@@ -40,8 +41,11 @@ func (c *SettingsCmd) Run() error {
 	return r.Run()
 }
 
-func Main() *kong.Kong {
-	cli := &CLI{}
+
+func Main(version string) *kong.Kong {
+	cli := &CLI{
+		Version: VersionCmd{version: version},
+	}
 	return kong.Must(cli,
 		kong.Name("diffy"),
 		kong.Description("CLI designed to deliver comprehensive statistics and insights from code reviews and differential analysis"),
