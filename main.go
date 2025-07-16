@@ -1,13 +1,15 @@
 package main
 
 import (
-	"log"
+	"os"
 
 	"github.com/moisesvega/diffy/internal/cmd"
 )
 
 func main() {
-	if err := cmd.Main().Execute(); err != nil {
-		log.Fatal(err)
-	}
+	kong := cmd.Main()
+	kctx, err := kong.Parse(os.Args[1:])
+	kong.FatalIfErrorf(err)
+	err = kctx.Run()
+	kong.FatalIfErrorf(err)
 }

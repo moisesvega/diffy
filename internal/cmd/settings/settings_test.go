@@ -7,17 +7,16 @@ import (
 
 	"github.com/moisesvega/diffy/internal/config/configmock"
 	"github.com/moisesvega/diffy/internal/editor/editormock"
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
 
-func TestNew(t *testing.T) {
-	require.NotNil(t, New())
+func TestNewRunner(t *testing.T) {
+	require.NotNil(t, NewRunner())
 }
 
-func TestRunE(t *testing.T) {
+func TestRun(t *testing.T) {
 	r := &runner{
 		xdgConfig: func(s string) (string, error) {
 			return "", nil
@@ -33,7 +32,7 @@ func TestXDGConfigError(t *testing.T) {
 			return "", want
 		},
 	}
-	err := r.runE(&cobra.Command{}, []string{})
+	err := r.Run()
 	require.Error(t, err)
 	assert.ErrorIs(t, err, want)
 }
@@ -53,7 +52,7 @@ func TestOpenSettings(t *testing.T) {
 		},
 	}
 
-	err := r.runE(&cobra.Command{}, []string{})
+	err := r.Run()
 	require.NoError(t, err)
 	require.NotNil(t, r)
 }
@@ -72,7 +71,7 @@ func TestOpenSettingsError(t *testing.T) {
 			return pathToSettings, nil
 		},
 	}
-	err := r.runE(&cobra.Command{}, []string{})
+	err := r.Run()
 	require.Error(t, err)
 	assert.ErrorIs(t, err, want)
 }
