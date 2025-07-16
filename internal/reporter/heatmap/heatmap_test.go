@@ -67,7 +67,7 @@ func TestReport(t *testing.T) {
 │ Friday  │ 0 │   │
 │Saturday │ 0 │   │
 ╰─────────┴───┴───╯
- Total Differentials: 16 | Total Lines Changed: 176
+Total Differentials: 16 | Total Lines Changed: 176
 `
 	originalNow := now
 	t.Cleanup(func() {

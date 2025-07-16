@@ -148,7 +148,6 @@ func (r *reporter) reportUser(user *entity.User, opts *entity.ReporterOptions) e
 	totalsStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(_whiteFontColor)).
 		Background(lipgloss.Color(_background)).
-		Padding(0, 1).
 		Bold(true)
 
 	totalsText := fmt.Sprintf("Total Differentials: %s | Total Lines Changed: %s",
