@@ -22,6 +22,7 @@ import (
 type MockOperations struct {
 	ctrl     *gomock.Controller
 	recorder *MockOperationsMockRecorder
+	isgomock struct{}
 }
 
 // MockOperationsMockRecorder is the mock recorder for MockOperations.
@@ -42,30 +43,30 @@ func (m *MockOperations) EXPECT() *MockOperationsMockRecorder {
 }
 
 // CreateDefaults mocks base method.
-func (m *MockOperations) CreateDefaults(arg0 string) error {
+func (m *MockOperations) CreateDefaults(path string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateDefaults", arg0)
+	ret := m.ctrl.Call(m, "CreateDefaults", path)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateDefaults indicates an expected call of CreateDefaults.
-func (mr *MockOperationsMockRecorder) CreateDefaults(arg0 any) *gomock.Call {
+func (mr *MockOperationsMockRecorder) CreateDefaults(path any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDefaults", reflect.TypeOf((*MockOperations)(nil).CreateDefaults), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDefaults", reflect.TypeOf((*MockOperations)(nil).CreateDefaults), path)
 }
 
 // Read mocks base method.
-func (m *MockOperations) Read(arg0 string) (*config.Config, error) {
+func (m *MockOperations) Read(path string) (*config.Config, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Read", arg0)
+	ret := m.ctrl.Call(m, "Read", path)
 	ret0, _ := ret[0].(*config.Config)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Read indicates an expected call of Read.
-func (mr *MockOperationsMockRecorder) Read(arg0 any) *gomock.Call {
+func (mr *MockOperationsMockRecorder) Read(path any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockOperations)(nil).Read), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockOperations)(nil).Read), path)
 }

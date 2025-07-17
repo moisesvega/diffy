@@ -10,10 +10,10 @@
 package phabricatormock
 
 import (
-	"reflect"
+	reflect "reflect"
 
-	"github.com/moisesvega/diffy/internal/entity"
-	"go.uber.org/mock/gomock"
+	entity "github.com/moisesvega/diffy/internal/entity"
+	gomock "go.uber.org/mock/gomock"
 )
 
 //go:generate mockgen -destination=mock.go -package=phabricatormock -write_generate_directive github.com/moisesvega/diffy/internal/client/phabricator Client
@@ -22,6 +22,7 @@ import (
 type MockClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockClientMockRecorder
+	isgomock struct{}
 }
 
 // MockClientMockRecorder is the mock recorder for MockClient.
@@ -42,16 +43,16 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 }
 
 // GetUsers mocks base method.
-func (m *MockClient) GetUsers(arg0 []string) ([]*entity.User, error) {
+func (m *MockClient) GetUsers(names []string) ([]*entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUsers", arg0)
+	ret := m.ctrl.Call(m, "GetUsers", names)
 	ret0, _ := ret[0].([]*entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetUsers indicates an expected call of GetUsers.
-func (mr *MockClientMockRecorder) GetUsers(arg0 any) *gomock.Call {
+func (mr *MockClientMockRecorder) GetUsers(names any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockClient)(nil).GetUsers), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUsers", reflect.TypeOf((*MockClient)(nil).GetUsers), names)
 }

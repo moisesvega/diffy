@@ -12,7 +12,7 @@ package reportermock
 import (
 	reflect "reflect"
 
-	model "github.com/moisesvega/diffy/internal/entity"
+	entity "github.com/moisesvega/diffy/internal/entity"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -22,6 +22,7 @@ import (
 type MockReporter struct {
 	ctrl     *gomock.Controller
 	recorder *MockReporterMockRecorder
+	isgomock struct{}
 }
 
 // MockReporterMockRecorder is the mock recorder for MockReporter.
@@ -42,7 +43,7 @@ func (m *MockReporter) EXPECT() *MockReporterMockRecorder {
 }
 
 // Report mocks base method.
-func (m *MockReporter) Report(arg0 []*model.User, arg1 ...model.ReporterOption) error {
+func (m *MockReporter) Report(arg0 []*entity.User, arg1 ...entity.ReporterOption) error {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0}
 	for _, a := range arg1 {
