@@ -1,4 +1,4 @@
-# version: 2  # Remove this line for v1 compatibility
+version: 2
 
 before:
   hooks:
