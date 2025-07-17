@@ -1,0 +1,53 @@
+[settings]
+lockfile = true
+
+[env]
+GOTESTSUM_FORMAT = "testname"
+
+[tools]
+go = "latest"
+
+gotestsum = "latest"
+
+gofumpt = "latest"
+
+golangci-lint = "latest"
+
+changie = "latest"
+
+[tasks.build]
+description = "Build the project"
+run = "go build ./..."
+
+[tasks.test]
+description = "Run tests"
+depends = ["generate"]
+run = "gotestsum -- -coverprofile=cover.out.tmp $(go list ./... | grep -v mock) && cat cover.out.tmp | grep -v \"mock\" > cover.out || true"
+
+[tasks.cover]
+description = "Run tests with coverage"
+run = """
+gotestsum -- -race -coverprofile=cover.out.tmp -coverpkg=./... $(go list ./... | grep -v mock) \
+&& cat cover.out.tmp | grep -v "mock.go" > cover.out \
+&& go tool cover -html=cover.out -o cover.html
+"""
+
+[tasks.tidy]
+description = "Tidy go modules"
+run = "go mod tidy"
+
+[tasks.lint]
+description = "Run linter"
+run = "golangci-lint run"
+
+[tasks.generate]
+description = "Generate code"
+run = "go generate -x ./..."
+
+[tasks.all]
+description = "Build, lint and test"
+depends = ["build", "lint", "test"]
+
+[tasks.changie]
+run = "changie"
+description = "Convenience alias to run changie"

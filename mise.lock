@@ -1,0 +1,34 @@
+[tools.changie]
+version = "v1.22.0"
+backend = "aqua:miniscruff/changie"
+
+[tools.changie.checksums]
+"changie_1.22.0_darwin_arm64.tar.gz" = "sha256:81f9eb0ef03662c3ba8a82f58901af57d50817eb9a2068ab2750b003ec106b2b"
+
+[tools.go]
+version = "1.24.5"
+backend = "core:go"
+
+[tools.go.checksums]
+"go1.24.5.darwin-arm64.tar.gz" = "sha256:92d30a678f306c327c544758f2d2fa5515aa60abe9dba4ca35fbf9b8bfc53212"
+
+[tools.gofumpt]
+version = "v0.8.0"
+backend = "aqua:mvdan/gofumpt"
+
+[tools.gofumpt.checksums]
+"gofumpt_v0.8.0_darwin_arm64" = "sha256:7e66e92b7a67d1d12839ab030fb7ae38e5e2273474af3762e67bc7fe9471fcd9"
+
+[tools.golangci-lint]
+version = "2.2.2"
+backend = "aqua:golangci/golangci-lint"
+
+[tools.golangci-lint.checksums]
+"golangci-lint-2.2.2-darwin-arm64.tar.gz" = "sha256:d84d94d042c0d495fd1746f3d18948a75de163b17a14e8de3ef840928dd2df74"
+
+[tools.gotestsum]
+version = "v1.12.3"
+backend = "aqua:gotestyourself/gotestsum"
+
+[tools.gotestsum.checksums]
+"gotestsum_1.12.3_darwin_arm64.tar.gz" = "sha256:a2cdc441a1355c8cfe35f4deaa0d6c8b73a9530f8c8d02e2c00fe4fae7aa5c45"
