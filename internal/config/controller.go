@@ -59,16 +59,20 @@ func (c *Controller) Read(path string) (*Config, error) {
 }
 
 // CreateDefaults creates a new default configuration file at the given path
-func (c *Controller) CreateDefaults(path string) error {
+func (c *Controller) CreateDefaults(path string) (err error) {
 	// create the file
-	if err := c.mkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err = c.mkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
 	f, err := c.createFile(path)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() {
+		if closeErr := f.Close(); closeErr != nil && err == nil {
+			err = closeErr
+		}
+	}()
 	// write the default configuration to the file
 	out, err := c.yamMarshal(DefaultConfiguration())
 	if err != nil {
