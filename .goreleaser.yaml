@@ -18,7 +18,7 @@ builds:
         goarch: arm
     main: ./main.go
     binary: diffy
-    ldflags: '-s -w -X main.version={{.Version}}'
+    ldflags: '-s -w -X main._version={{.Version}}'
 
 archives:
   - format: tar.gz

@@ -6,10 +6,8 @@ import (
 	"github.com/moisesvega/diffy/internal/cmd"
 )
 
-var version = "dev"
-
 func main() {
-	kong := cmd.Main(version)
+	kong := cmd.Main(_version)
 	kctx, err := kong.Parse(os.Args[1:])
 	kong.FatalIfErrorf(err)
 	err = kctx.Run()
