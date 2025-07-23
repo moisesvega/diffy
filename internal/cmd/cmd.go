@@ -11,6 +11,7 @@ import (
 	"github.com/moisesvega/diffy/internal/editor"
 	"github.com/moisesvega/diffy/internal/entity"
 	"github.com/moisesvega/diffy/internal/reporter/heatmap"
+	"github.com/moisesvega/diffy/internal/reporter/yearly"
 )
 
 type CLI struct {
@@ -29,7 +30,7 @@ func (c *AnalyzeCmd) Run() error {
 		config:    config.New(),
 		phabNew:   phabricator.New,
 		xdgConfig: xdg.ConfigFile,
-		reporters: []entity.Reporter{heatmap.New()},
+		reporters: []entity.Reporter{heatmap.New(), yearly.New()},
 	}
 	return r.run(c.Users)
 }
