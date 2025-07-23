@@ -8,12 +8,12 @@ import (
 
 // YearlyStats represents statistics for a specific year
 type YearlyStats struct {
-	Year                 int     `json:"year"`
-	TotalDifferentials   int     `json:"total_differentials"`
-	TotalLinesChanged    int     `json:"total_lines_changed"`
-	AvgLinesPerDiff      float64 `json:"avg_lines_per_diff"`
-	AcceptedDifferentials int    `json:"accepted_differentials"`
-	AcceptanceRate       float64 `json:"acceptance_rate"`
+	Year                  int     `json:"year"`
+	TotalDifferentials    int     `json:"total_differentials"`
+	TotalLinesChanged     int     `json:"total_lines_changed"`
+	AvgLinesPerDiff       float64 `json:"avg_lines_per_diff"`
+	AcceptedDifferentials int     `json:"accepted_differentials"`
+	AcceptanceRate        float64 `json:"acceptance_rate"`
 }
 
 // YearOverYearProgress represents year-over-year progression data
@@ -32,16 +32,16 @@ func AnalyzeTotalDifferentialPerYear(users []*entity.User) map[int]YearlyStats {
 	for _, user := range users {
 		for _, diff := range user.Differentials {
 			year := diff.CreatedAt.Year()
-			
+
 			stats := yearlyData[year]
 			stats.Year = year
 			stats.TotalDifferentials++
 			stats.TotalLinesChanged += diff.LineCount
-			
+
 			if diff.Status == entity.Accepted {
 				stats.AcceptedDifferentials++
 			}
-			
+
 			yearlyData[year] = stats
 		}
 	}
@@ -74,12 +74,12 @@ func CalculateYearOverYearProgress(yearlyData map[int]YearlyStats, targetYear in
 
 	// Calculate growth percentages
 	if previousStats.TotalDifferentials > 0 {
-		progress.DifferentialsGrowth = float64(currentStats.TotalDifferentials-previousStats.TotalDifferentials) / 
+		progress.DifferentialsGrowth = float64(currentStats.TotalDifferentials-previousStats.TotalDifferentials) /
 			float64(previousStats.TotalDifferentials) * 100
 	}
 
 	if previousStats.TotalLinesChanged > 0 {
-		progress.LinesChangedGrowth = float64(currentStats.TotalLinesChanged-previousStats.TotalLinesChanged) / 
+		progress.LinesChangedGrowth = float64(currentStats.TotalLinesChanged-previousStats.TotalLinesChanged) /
 			float64(previousStats.TotalLinesChanged) * 100
 	}
 
@@ -116,10 +116,10 @@ func AnalyzeUserYearlyProgress(user *entity.User) map[int]YearlyStats {
 func GetCurrentYearStats(users []*entity.User) YearlyStats {
 	currentYear := time.Now().Year()
 	yearlyData := AnalyzeTotalDifferentialPerYear(users)
-	
+
 	if stats, exists := yearlyData[currentYear]; exists {
 		return stats
 	}
-	
+
 	return YearlyStats{Year: currentYear}
 }

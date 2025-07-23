@@ -68,7 +68,7 @@ func formatNumber(n int) string {
 // formatPercentage formats a percentage with appropriate color coding
 func formatPercentage(value float64) string {
 	percentStr := fmt.Sprintf("%.1f%%", value)
-	
+
 	if value > 0 {
 		return positiveStyle.Render("+" + percentStr)
 	} else if value < 0 {
@@ -96,7 +96,7 @@ func (r *reporter) Report(users []*entity.User, option ...entity.ReporterOption)
 
 	// Get available years
 	years := analysis.GetAvailableYears(yearlyData)
-	
+
 	// Create yearly summary table
 	fmt.Fprint(w, "\n")
 	r.printYearlySummary(w, yearlyData, years)
@@ -130,7 +130,7 @@ func (r *reporter) printYearlySummary(w io.Writer, yearlyData map[int]analysis.Y
 		stats := yearlyData[year]
 		totalDifferentials += stats.TotalDifferentials
 		totalLinesChanged += stats.TotalLinesChanged
-		
+
 		rows = append(rows, []string{
 			strconv.Itoa(year),
 			formatNumber(stats.TotalDifferentials),
@@ -144,7 +144,7 @@ func (r *reporter) printYearlySummary(w io.Writer, yearlyData map[int]analysis.Y
 	if totalDifferentials > 0 {
 		avgLinesOverall = float64(totalLinesChanged) / float64(totalDifferentials)
 	}
-	
+
 	rows = append(rows, []string{
 		headerStyle.Render("Total"),
 		headerStyle.Render(formatNumber(totalDifferentials)),

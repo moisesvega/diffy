@@ -85,20 +85,20 @@ func TestAnalyzeTotalDifferentialPerYear(t *testing.T) {
 func TestCalculateYearOverYearProgress(t *testing.T) {
 	yearlyData := map[int]YearlyStats{
 		2023: {
-			Year:                 2023,
-			TotalDifferentials:   10,
-			TotalLinesChanged:    1000,
+			Year:                  2023,
+			TotalDifferentials:    10,
+			TotalLinesChanged:     1000,
 			AcceptedDifferentials: 8,
-			AcceptanceRate:       80.0,
-			AvgLinesPerDiff:      100.0,
+			AcceptanceRate:        80.0,
+			AvgLinesPerDiff:       100.0,
 		},
 		2024: {
-			Year:                 2024,
-			TotalDifferentials:   15,
-			TotalLinesChanged:    1200,
+			Year:                  2024,
+			TotalDifferentials:    15,
+			TotalLinesChanged:     1200,
 			AcceptedDifferentials: 14,
-			AcceptanceRate:       93.33,
-			AvgLinesPerDiff:      80.0,
+			AcceptanceRate:        93.33,
+			AvgLinesPerDiff:       80.0,
 		},
 	}
 

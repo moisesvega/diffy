@@ -10,7 +10,6 @@ import (
 )
 
 func TestByLineCount(t *testing.T) {
-
 	tests := []struct {
 		desc  string
 		count int

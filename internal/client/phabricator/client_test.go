@@ -77,7 +77,8 @@ func TestClient_GetUsers(t *testing.T) {
 				UserName: user,
 				PHID:     userPHID,
 			},
-		}})
+		},
+	})
 	require.NoError(t, err)
 
 	// First call to the server to get the user
@@ -88,7 +89,8 @@ func TestClient_GetUsers(t *testing.T) {
 			&entities.DifferentialRevision{
 				AuthorPHID: userPHID,
 			},
-		}})
+		},
+	})
 	require.NoError(t, err)
 
 	// In the second call we will call the server to get the differentials
@@ -100,7 +102,8 @@ func TestClient_GetUsers(t *testing.T) {
 			&entities.DifferentialRevision{
 				AuthorPHID: userPHID,
 			},
-		}})
+		},
+	})
 	require.NoError(t, err)
 	// In the third call we will call the server to get the differentials
 	// where the user is the reviewer

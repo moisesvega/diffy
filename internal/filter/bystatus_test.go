@@ -10,7 +10,6 @@ import (
 )
 
 func TestByStatus(t *testing.T) {
-
 	tests := []struct {
 		desc   string
 		status entity.Status

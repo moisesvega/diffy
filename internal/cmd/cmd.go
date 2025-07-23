@@ -42,7 +42,6 @@ func (c *SettingsCmd) Run() error {
 	return r.Run()
 }
 
-
 func Main(version string) *kong.Kong {
 	cli := &CLI{
 		Version: VersionCmd{version: version},

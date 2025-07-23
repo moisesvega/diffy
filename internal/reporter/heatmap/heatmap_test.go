@@ -46,7 +46,6 @@ func TestReport(t *testing.T) {
 				ModifiedAt: day,
 			})
 		}
-
 	}
 	give := []*entity.User{
 		{
@@ -162,7 +161,7 @@ func TestReportWithLargeNumbers(t *testing.T) {
 		differentials = append(differentials, &entity.Differential{
 			Title:      fmt.Sprintf("title_%d", i),
 			URI:        fmt.Sprintf("uri_%d", i),
-			LineCount:  250, // 250 lines each = 1,250,000 total lines
+			LineCount:  250,                             // 250 lines each = 1,250,000 total lines
 			ModifiedAt: wednesday.AddDate(0, 0, -i%365), // Spread over a year
 		})
 	}

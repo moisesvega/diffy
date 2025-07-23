@@ -11,7 +11,6 @@ import (
 )
 
 func Test(t *testing.T) {
-
 }
 
 func TestFromPhabricatorDifferential(t *testing.T) {
