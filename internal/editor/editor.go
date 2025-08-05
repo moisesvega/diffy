@@ -10,7 +10,7 @@ type Open interface {
 	OpenFile(string) error
 }
 
-// Controller manages actions related to the editor.
+// The Controller manages actions related to the editor.
 type Controller struct {
 	In       io.Reader
 	Out, Err io.Writer
@@ -30,12 +30,23 @@ func New(in io.Reader, out, err io.Writer) *Controller {
 	}
 }
 
-const _editorEnvVar = "EDITOR"
+const (
+	_editorEnvVar  = "EDITOR"
+	_defaultEditor = "vi"
+)
+
+func getEditor() string {
+	editor := os.Getenv(_editorEnvVar)
+	if len(editor) == 0 {
+		return _defaultEditor
+	}
+	return editor
+}
 
 // OpenFile opens a file in the editor
 // It uses the EDITOR environment variable to determine the editor to use
 func (e *Controller) OpenFile(filepath string) error {
-	cmd := e.command(os.Getenv(_editorEnvVar), filepath)
+	cmd := e.command(getEditor(), filepath)
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = e.In, e.Out, e.Err
 	return cmd.Run()
 }

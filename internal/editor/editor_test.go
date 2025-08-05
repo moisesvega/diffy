@@ -70,3 +70,29 @@ func TestHelperProcess(t *testing.T) {
 		return
 	}
 }
+
+func TestGetEditor(t *testing.T) {
+	tests := []struct {
+		desc string
+		give string
+		want string
+	}{
+		{
+			desc: "returns vi when EDITOR not set",
+			give: "",
+			want: "vi",
+		},
+		{
+			desc: "returns EDITOR value when set",
+			give: "nano",
+			want: "nano",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.give, func(t *testing.T) {
+			t.Setenv(_editorEnvVar, tt.give)
+			assert.Equal(t, tt.want, getEditor())
+		})
+	}
+}
