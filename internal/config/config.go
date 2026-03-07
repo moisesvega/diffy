@@ -7,6 +7,14 @@ type Config struct {
 
 type APIs struct {
 	Phabricator Phabricator `yaml:"phabricator"`
+	GitHub      GitHub      `yaml:"github"`
+}
+
+// GitHub configuration to set a proper GitHub Client
+type GitHub struct {
+	BaseURL  string `yaml:"base_url"`
+	Token    string `yaml:"token"`
+	TokenEnv string `yaml:"token_env"`
 }
 
 // Phabricator configuration to set a proper Phabricator Client
@@ -26,6 +34,9 @@ func DefaultConfiguration() *Config {
 				URL:            _replaceMe,
 				APITokenEnv:    _defaultPhabricatorAPITokenEnv,
 				AccessTokenEnv: _defaultPhabricatorAccessToken,
+			},
+			GitHub: GitHub{
+				TokenEnv: _defaultGitHubTokenEnv,
 			},
 		},
 	}

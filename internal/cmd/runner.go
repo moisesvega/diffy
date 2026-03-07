@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"slices"
 
+	"github.com/moisesvega/diffy/internal/client/github"
 	"github.com/moisesvega/diffy/internal/client/phabricator"
 	"github.com/moisesvega/diffy/internal/config"
 	"github.com/moisesvega/diffy/internal/editor"
@@ -16,6 +17,7 @@ import (
 type runner struct {
 	editor    editor.Open
 	phabNew   func(config.Phabricator) (phabricator.Client, error)
+	githubNew func(config.GitHub) (github.Client, error)
 	config    config.Operations
 	xdgConfig func(string) (string, error)
 	reporters []entity.Reporter
@@ -31,7 +33,11 @@ var (
 	errConfigNotFound = errors.New("config file not found, please run `diffy --settings` to create one")
 )
 
-func (r *runner) run(args []string) error {
+type userFetcher interface {
+	GetUsers(names []string) ([]*entity.User, error)
+}
+
+func (r *runner) run(args []string, source string) error {
 	sPath, err := r.xdgConfig(settingsFilePath)
 	if err != nil {
 		return err
@@ -41,12 +47,18 @@ func (r *runner) run(args []string) error {
 		return fmt.Errorf("%w: %w", errConfigNotFound, err)
 	}
 
-	phab, err := r.phabNew(cfg.APIs.Phabricator)
+	var fetcher userFetcher
+	switch source {
+	case "github":
+		fetcher, err = r.githubNew(cfg.APIs.GitHub)
+	default:
+		fetcher, err = r.phabNew(cfg.APIs.Phabricator)
+	}
 	if err != nil {
 		return err
 	}
 
-	u, err := phab.GetUsers(args)
+	u, err := fetcher.GetUsers(args)
 	if err != nil {
 		return err
 	}

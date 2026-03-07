@@ -21,7 +21,7 @@ func TestRun(t *testing.T) {
 		},
 	}
 	require.NotPanics(t, func() {
-		err := r.run([]string{})
+		err := r.run([]string{}, "phabricator")
 		require.Error(t, err)
 		assert.ErrorIs(t, err, want)
 	})

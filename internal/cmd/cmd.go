@@ -5,6 +5,7 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/alecthomas/kong"
+	"github.com/moisesvega/diffy/internal/client/github"
 	"github.com/moisesvega/diffy/internal/client/phabricator"
 	"github.com/moisesvega/diffy/internal/cmd/settings"
 	"github.com/moisesvega/diffy/internal/config"
@@ -21,7 +22,8 @@ type CLI struct {
 }
 
 type AnalyzeCmd struct {
-	Users []string `arg:"" optional:"" help:"Usernames to analyze (e.g., user1 user2)."`
+	Users  []string `arg:"" optional:"" help:"Usernames to analyze (e.g., user1 user2)."`
+	Source string   `help:"Source to analyze (phabricator, github)." default:"phabricator" enum:"phabricator,github"`
 }
 
 func (c *AnalyzeCmd) Run() error {
@@ -29,10 +31,11 @@ func (c *AnalyzeCmd) Run() error {
 		editor:    editor.New(os.Stdin, os.Stdout, os.Stderr),
 		config:    config.New(),
 		phabNew:   phabricator.New,
+		githubNew: github.New,
 		xdgConfig: xdg.ConfigFile,
 		reporters: []entity.Reporter{heatmap.New(), yearly.New()},
 	}
-	return r.run(c.Users)
+	return r.run(c.Users, c.Source)
 }
 
 type SettingsCmd struct{}

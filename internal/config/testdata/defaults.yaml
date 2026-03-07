@@ -5,3 +5,7 @@ apis:
         api_token_env: PHAB_API_TOKEN
         access_token: ""
         access_token_env: PHAB_ACCESS_TOKEN
+    github:
+        base_url: ""
+        token: ""
+        token_env: GITHUB_TOKEN

@@ -12,6 +12,7 @@ const (
 	_replaceMe                     = "<replace_me>"
 	_defaultPhabricatorAPITokenEnv = "PHAB_API_TOKEN"
 	_defaultPhabricatorAccessToken = "PHAB_ACCESS_TOKEN"
+	_defaultGitHubTokenEnv         = "GITHUB_TOKEN"
 	_mode                          = os.FileMode(0o677)
 )
 
