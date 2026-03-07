@@ -23,12 +23,6 @@ const (
 )
 
 var (
-	titleStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color(_whiteFontColor)).
-			Background(lipgloss.Color(_background)).
-			Bold(true).
-			Padding(1, 0)
-
 	positiveStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color(_greenColor)).
 			Bold(true)

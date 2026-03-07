@@ -127,7 +127,7 @@ func (c *client) doSearch(u string) ([]searchItem, int, error) {
 	if err != nil {
 		return nil, 0, fmt.Errorf("search request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, 0, fmt.Errorf("search API returned status %d", resp.StatusCode)
@@ -145,7 +145,7 @@ func (c *client) getPRDetail(prURL string) (*pullRequestDetail, error) {
 	if err != nil {
 		return nil, fmt.Errorf("PR detail request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("PR detail API returned status %d", resp.StatusCode)

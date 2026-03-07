@@ -89,11 +89,11 @@ func newTestServer(t *testing.T) *httptest.Server {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	})
 
 	mux.HandleFunc("/repos/org/repo/pulls/1", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(pullRequestDetail{
+		_ = json.NewEncoder(w).Encode(pullRequestDetail{
 			Number:    1,
 			Title:     "Fix bug",
 			State:     "closed",
@@ -107,7 +107,7 @@ func newTestServer(t *testing.T) *httptest.Server {
 	})
 
 	mux.HandleFunc("/repos/org/repo/pulls/2", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(pullRequestDetail{
+		_ = json.NewEncoder(w).Encode(pullRequestDetail{
 			Number:    2,
 			Title:     "Add feature",
 			State:     "open",
@@ -191,7 +191,7 @@ func TestGetUsers_PRDetailError(t *testing.T) {
 				},
 			},
 		}
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	})
 
 	mux.HandleFunc("/repos/org/repo/pulls/1", func(w http.ResponseWriter, r *http.Request) {
@@ -275,7 +275,7 @@ func TestDoRequest_AuthHeader(t *testing.T) {
 
 	resp, err := c.doRequest(srv.URL + "/test")
 	require.NoError(t, err)
-	resp.Body.Close()
+	_ = resp.Body.Close()
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
@@ -313,11 +313,11 @@ func TestSearchPagination(t *testing.T) {
 				},
 			}
 		}
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	})
 
 	mux.HandleFunc("/repos/org/repo/pulls/1", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(pullRequestDetail{
+		_ = json.NewEncoder(w).Encode(pullRequestDetail{
 			Number: 1, Title: "PR", State: "closed", Merged: true,
 			Additions: 1, Deletions: 0, HTMLURL: "url",
 		})
@@ -336,4 +336,99 @@ func TestSearchPagination(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, diffs, _perPage+1)
 	assert.Equal(t, 2, callCount)
+}
+
+func TestDoSearch_DecodeError(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte("invalid json"))
+	}))
+	t.Cleanup(srv.Close)
+
+	c := &client{baseURL: srv.URL, token: "tok", httpClient: srv.Client()}
+	_, _, err := c.doSearch(srv.URL + "/search/issues?q=test")
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to decode search response")
+}
+
+func TestGetPRDetail_DecodeError(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte("not json"))
+	}))
+	t.Cleanup(srv.Close)
+
+	c := &client{baseURL: srv.URL, token: "tok", httpClient: srv.Client()}
+	_, err := c.getPRDetail(srv.URL + "/repos/org/repo/pulls/1")
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to decode PR detail")
+}
+
+func TestDoRequest_InvalidURL(t *testing.T) {
+	c := &client{token: "tok", httpClient: &http.Client{}}
+	_, err := c.doRequest("://invalid")
+	require.Error(t, err)
+}
+
+func TestGetPRs_NilPullRequest(t *testing.T) {
+	var srv *httptest.Server
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/search/issues", func(w http.ResponseWriter, r *http.Request) {
+		resp := searchResponse{
+			TotalCount: 2,
+			Items: []searchItem{
+				{Number: 1, PullRequest: nil},
+				{Number: 2, PullRequest: &pullRequestRef{URL: ""}},
+			},
+		}
+		_ = json.NewEncoder(w).Encode(resp)
+	})
+
+	srv = httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+
+	c := &client{baseURL: srv.URL, token: "tok", httpClient: srv.Client()}
+	diffs, err := c.getPRs("author", "user")
+	require.NoError(t, err)
+	assert.Empty(t, diffs)
+}
+
+func TestGetUsers_ReviewError(t *testing.T) {
+	var srv *httptest.Server
+	mux := http.NewServeMux()
+	callCount := 0
+
+	mux.HandleFunc("/search/issues", func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		if callCount == 1 {
+			// First call (authored PRs) succeeds with empty results
+			_ = json.NewEncoder(w).Encode(searchResponse{TotalCount: 0})
+		} else {
+			// Second call (reviewed PRs) fails
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	})
+
+	srv = httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+
+	c := &client{baseURL: srv.URL, token: "tok", httpClient: srv.Client()}
+	users, err := c.GetUsers([]string{"testuser"})
+	require.Error(t, err)
+	require.Nil(t, users)
+}
+
+func TestDoSearch_RequestError(t *testing.T) {
+	c := &client{baseURL: "http://localhost:0", token: "tok", httpClient: &http.Client{}}
+	_, _, err := c.doSearch("http://localhost:0/search/issues?q=test")
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "search request failed")
+}
+
+func TestGetPRDetail_RequestError(t *testing.T) {
+	c := &client{baseURL: "http://localhost:0", token: "tok", httpClient: &http.Client{}}
+	_, err := c.getPRDetail("http://localhost:0/repos/org/repo/pulls/1")
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "PR detail request failed")
 }
