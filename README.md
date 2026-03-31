@@ -45,4 +45,4 @@ This project is currently in active development. We're working on adding more fe
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details..
