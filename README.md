@@ -14,7 +14,6 @@ and enhance their code review/differential processes.
 
 ```bash
 go install github.com/moisesvega/diffy@latest
-
 ```
 
 ## Features
